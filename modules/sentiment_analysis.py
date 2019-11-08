@@ -1,5 +1,3 @@
-from api_calls import create_df_from_sources
-
 import pandas as pd
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
