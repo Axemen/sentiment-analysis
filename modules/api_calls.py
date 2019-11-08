@@ -1,9 +1,9 @@
 from newsapi import NewsApiClient
 import pandas as pd
-from modules.config import API_KEY
+# from modules.config import API_KEY
 
 def create_df_from_sources(sources_list):
-    api = NewsApiClient(api_key = API_KEY)
+    api = NewsApiClient(api_key = '1f1c834cb372461b999a1975a16c663a')
 
     # Iterate through soruces_list 
     for source in sources_list:
