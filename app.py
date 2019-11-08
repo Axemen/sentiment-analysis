@@ -12,8 +12,6 @@ from modules.api_calls import create_df_from_sources
 from modules.pre_processing import count_words
 from modules.sentiment_analysis import get_compound_score
 
-os.system('python -m spacy download en_core_web_sm')
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://nzayeaoeubwbsp:f469403088029d7b0e1f60a4abed52f78986b9c4c1c5ed4c15f86582f5f93e4e@ec2-54-243-239-199.compute-1.amazonaws.com:5432/dbc19knfss9ho8'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
