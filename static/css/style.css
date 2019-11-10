@@ -21,3 +21,7 @@
     height: 40vh;
     background-color: red;
 }
+.line {
+    fill: none;
+    stroke-width: 2px;
+}

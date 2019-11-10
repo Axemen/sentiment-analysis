@@ -7,9 +7,11 @@ import pandas as pd
 import spacy
 from newsapi import NewsApiClient
 
-stop_words = set(stopwords.words('english'))
-nlp = spacy.load("en_core_web_sm")
+import en_core_web_sm
 
+stop_words = set(stopwords.words('english'))
+# nlp = spacy.load("en_core_web_sm")
+nlp = en_core_web_sm.load()
 
 def remove_stop_words(input_string):
 
