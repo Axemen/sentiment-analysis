@@ -20,8 +20,8 @@ let negBarTrace = {
 }
 
 // let barGraph = new BarChart('barGraph', trace);
-// let multiLineGraph = new MultiLine('multiLineGraph', [trace])
-let barGraph = new BarChart('barGraph', negBarTrace);
+let multiLineGraph = new MultiLine('multiLineGraph', [trace])
+let barGraph = new BarChart('BarChart', negBarTrace);
 
 
 
@@ -29,10 +29,10 @@ let barGraph = new BarChart('barGraph', negBarTrace);
 
 d3.select('#update').on('click', () => {
     barGraph.updateBars(trace);
-    // multiLineGraph.addTrace(lineTrace2);
+    multiLineGraph.addTrace(lineTrace2);
 });
 
 window.addEventListener('resize', () => {
-    // multiLineGraph.render();
+    multiLineGraph.render();
     barGraph.render()
 });
