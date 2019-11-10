@@ -1,14 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/css/style.css">
 </head>
+
 <body>
     This is my test html!
-    <script src="../static/js/newsApi.js"></script>
+
+    <div class="row">
+        <div class="col-md-3"><button type="submit" id="update" >update</button></div>
+        <div class="col-md-6">
+            <div id="barGraph"></div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div id="multiLineGraph"></div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+
+
+    <script src="../static/js/bar.js"></script>
+    <script src="../static/js/multi-line.js"></script>
     <script src="../static/js/logic.js"></script>
 </body>
+
 </html>
