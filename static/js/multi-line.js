@@ -23,8 +23,10 @@ class MultiLine {
 
     init() {
         this.extents = this.getExtentOfCurrentTraces();
-        this.xScale = d3.scaleLinear().domain(this.extents.x);
-        this.yScale = d3.scaleLinear().domain([0, this.extents.y[1]]);
+        this.xScale = d3.scaleLinear()
+            .domain(this.extents.x);
+        this.yScale = d3.scaleLinear()
+            .domain(this.extents.y);
         this.color = d3.scaleOrdinal(d3.schemeCategory10);
 
         this.xAxis = d3.axisBottom();
@@ -37,6 +39,11 @@ class MultiLine {
         this.chartWrapper = this.svg.append('g');
         this.chartWrapper.append('g').classed('x axis', true);
         this.chartWrapper.append('g').classed('y axis', true);
+
+        // Appending line at zero in order to show the negative values in a better light. 
+        this.chartWrapper
+            .append('line')
+            .attr('class', 'zero-line')
 
         // TODO: add Named Trace functionality.
         this.traces.forEach((trace, i) => {
@@ -75,6 +82,16 @@ class MultiLine {
         this.svg.select('.y.axis')
             .transition()
             .call(this.yAxis);
+        
+        // Transition zero-line
+        this.chartWrapper.select('.zero-line')
+            .transition()
+            .attr('x1', 0)
+            .attr('y1', this.yScale(0))
+            .attr('x2', this.width)
+            .attr('y2', this.yScale(0))
+            .attr('stroke-width', 1)
+            .attr('stroke', 'grey');
 
         this.svg.selectAll('.line').style('stroke', (d, i) => this.color(i));
 
@@ -132,22 +149,24 @@ class MultiLine {
     }
 
     addTrace(trace) {
+        console.log(trace);
         // Assertions to make sure the code runs properly. 
         this.assert(trace.name, 'Trace must have name!')
-        this.assert(!this.traces.map(d => d.names).includes(trace.name), 'must have unique names!')
+        this.assert(!this.traces.map(d => d.name).includes(trace.name), 'must have unique names!')
+
+        this.traces.push(trace);
 
         this.extents = this.getExtentOfCurrentTraces();
         this.xScale.domain(this.extents.x);
-        this.yScale.domain([0, this.extents.y[1]]);
+        this.yScale.domain(this.extents.y);
 
         const traceData = this.getDataFromTrace(trace);
-
+        // console.log(traceData);
         trace.path = this.chartWrapper
             .datum(traceData)
             .append('path')
             .attr('class', `line ${trace.name}`);
 
-        this.traces.push(trace);
         this.render();
     }
     // Stolen from https://stackoverflow.com/questions/15313418/what-is-assert-in-javascript

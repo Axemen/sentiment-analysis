@@ -5,6 +5,7 @@ class BarChart {
         // Assign arguments to the object. 
         this.cssID = cssID;
         this.svg = d3.select(`#${cssID}`).append('svg');
+
         // If margin is null (no argument given) set a default margin
         if (!margin) {
             this.margin = {}
@@ -15,6 +16,7 @@ class BarChart {
         } else {
             this.margin = margin;
         }
+        
         // Translate trace data to a proper data format for d3
         this.data = this.getDataFromTrace(trace);
         this.init()
@@ -23,7 +25,6 @@ class BarChart {
     init() {
 
         this.yExtent = d3.extent(this.data, d => d.y);
-        // this.xExtent = d3.extent(this.data, d => d.x);
 
         if (this.yExtent[0] > 0) {
             this.yExtent[0] = 0;
@@ -47,8 +48,13 @@ class BarChart {
             .append('rect')
             .attr('class', 'bar');
 
-        this.chartWrapper.append('g').classed('x axis', true);
-        this.chartWrapper.append('g').classed('y axis', true);
+        // Appending Axis' to chartWrapper
+        this.chartWrapper.append('g')
+            .classed('x axis', true)
+            .style('font-size', '1rem');
+        this.chartWrapper.append('g')
+            .classed('y axis', true)
+            .style('font-size', '1rem');
 
         this.render()
     }
@@ -86,7 +92,7 @@ class BarChart {
             .attr('x', d => this.xScale(d.x))
             .attr('y', d => this.yScale(Math.max(0, d.y)))
             .attr('height', d => Math.abs(this.yScale(d.y) - this.yScale(0)))
-            .attr('width', d => this.xScale.bandwidth())
+            .attr('width', () => this.xScale.bandwidth())
             .style('fill', d => this.getColor(d.y));
     }
 
@@ -95,7 +101,6 @@ class BarChart {
         this.data = this.getDataFromTrace(newTrace);
 
         this.yExtent = d3.extent(this.data, d => d.y);
-        // this.xExtent = d3.extent(this.data, d => d.x);
 
         if (this.yExtent[0] > 0) {
             this.yExtent[0] = 0;
@@ -108,6 +113,11 @@ class BarChart {
         this.yScale
             .domain(this.yExtent);
 
+        this.chartWrapper.selectAll('rect')
+            .data(this.data)
+            .enter()
+            .append('rect')
+            .classed('bar', true);
         this.render()
     }
 
@@ -124,10 +134,11 @@ class BarChart {
     }
 
     getColor(value) {
+
         if (value > 0) {
             return 'steelblue';
         }
-        return 'crimson';
+        return 'darkorange';
     }
 }
 
