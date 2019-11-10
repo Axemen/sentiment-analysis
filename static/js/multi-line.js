@@ -9,10 +9,10 @@ class MultiLine {
         // If margin is null (no argument given) set a default margin
         if (!margin) {
             this.margin = {}
-            this.margin.top = 20;
-            this.margin.right = 50;
-            this.margin.left = 60;
-            this.margin.bottom = 50;
+            this.margin.top = 10;
+            this.margin.right = 0;
+            this.margin.left = 20;
+            this.margin.bottom = 20;
         } else {
             this.margin = margin;
         }
@@ -60,9 +60,10 @@ class MultiLine {
 
     render() {
 
-        const widthStr = d3.select(`#${this.cssID}`).style('width');
-        this.width = parseInt(widthStr) - this.margin.left - this.margin.right;
-        this.height = .5 * this.width;
+        this.parentElement = d3.select(`#${this.cssID}`);
+
+        this.width = parseInt(this.parentElement.style('width')) - this.margin.left - this.margin.right;
+        this.height = parseInt(this.parentElement.style('height'));
 
         this.xScale.range([0, this.width]);
         this.yScale.range([this.height, 0]);

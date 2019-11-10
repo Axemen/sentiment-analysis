@@ -21,19 +21,19 @@ let negBarTrace = {
 }
 
 // let barGraph = new BarChart('barGraph', trace);
-let multiLineGraph = new MultiLine('multiLineGraph', [negBarTrace])
-// let barGraph = new BarChart('barGraph', negBarTrace);
+let multiLineGraph = new MultiLine('multiLineGraph', [trace])
+let barGraph = new BarChart('BarChart', negBarTrace);
 
 
 
 // barGraph.updateBars(trace2);
 
 d3.select('#update').on('click', () => {
-    // barGraph.updateBars(trace);
+    barGraph.updateBars(trace);
     multiLineGraph.addTrace(lineTrace2);
 });
 
 window.addEventListener('resize', () => {
     multiLineGraph.render();
-    // barGraph.render()
+    barGraph.render()
 });
