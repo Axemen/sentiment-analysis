@@ -64,3 +64,7 @@ function handleCheckBox() {
         scatter.removeTrace(d3.event.target.name);
     }
 }
+
+window.addEventListener('resize', () => {
+    scatter.render();
+})
