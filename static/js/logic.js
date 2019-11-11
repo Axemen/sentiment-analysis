@@ -1,39 +1,66 @@
+
+let parseTime = d3.timeParse('%Y-%m-%dT%H:%M:%SZ');
+let formatTime = d3.timeFormat('%H:%M');
+
 let trace = {
-    x: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    y: [20, 100, 30, 80, 90, 100, 110, 80, 10, 20],
-    name: 'blue'
+    x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    y: [0, 1, 2, 3, 4, -1, -2, -3, -4, -3],
+    name: 'trace1'
 }
 
 let trace2 = {
-    x: ['this', 'is', 'a', 'trace'],
-    y: [20, 10, 50, 16]
-}
-let lineTrace2 = {
-    x: [1, 2, 3, 4],
-    y: [80, 20, 70, 20],
-    name: 'Orange'
+    x: [0, 1, 2],
+    y: [-1, -2, -3],
+    name: 'trace2'
 }
 
-let negBarTrace = {
-    x: [1, 2, 3, 4],
-    y: [10, 20, -10, -20],
-    name: 'neg-trace'
-}
-
-// let barGraph = new BarChart('barGraph', trace);
-let multiLineGraph = new MultiLine('multiLineGraph', [trace])
-let barGraph = new BarChart('BarChart', negBarTrace);
-
-
-
-// barGraph.updateBars(trace2);
+// let scatter = new scatterPlot('BarChart', [trace]);
 
 d3.select('#update').on('click', () => {
-    barGraph.updateBars(trace);
-    multiLineGraph.addTrace(lineTrace2);
+    // updateScatterBySource('nbc-news');
+    scatter.removeTrace('cnn-scatter');
+})
+
+getRecords('cnn').then(data => {
+
+    data.forEach(d => d.publishedAt = parseTime(d.publishedAt));
+    data.sort((a, b) => a.publishedAt - b.publishedAt);
+    data.forEach(d => formatTime(d.publishedAt));
+
+    let trace = {
+        x: data.map(d => d.publishedAt),
+        y: data.map(d => d.title_compound),
+        name: 'cnn'
+    }
+
+    scatter = new scatterPlot('scatterPlot', [trace])
+
 });
 
-window.addEventListener('resize', () => {
-    multiLineGraph.render();
-    barGraph.render()
-});
+function updateScatterBySource(source) {
+    getRecords(source).then(data => {
+        data.forEach(d => d.publishedAt = parseTime(d.publishedAt));
+        data.sort((a, b) => a.publishedAt - b.publishedAt);
+
+        let trace = {
+            x: data.map(d => d.publishedAt),
+            y: data.map(d => d.title_compound),
+            name: source
+        }
+        scatter.addTrace(trace);
+    })
+}
+
+
+d3.select('#scatter-checkboxes')
+    .selectAll('input')
+    .on('click', handleCheckBox)
+
+function handleCheckBox() {
+    console.log(d3.event.target.name);
+    if(d3.event.target.checked){
+        updateScatterBySource(d3.event.target.name);
+    }else{
+        scatter.removeTrace(d3.event.target.name);
+    }
+}

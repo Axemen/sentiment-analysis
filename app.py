@@ -33,15 +33,16 @@ sources = ['cnn', 'nbc-news', 'bbc-news', 'fox-news', 'associated-press']
 def home():
     return render_template('index.html')
 
-# All sentiment scores that we have.
-@app.route('/get-sentiment-scores')
-def get_sentiment_scores():
+@app.route('/get-scores/<source>')
+def get_sentiment_scores(source):
     stmt = db.session.query(Headlines).statement
     df = pd.read_sql_query(stmt, db.session.bind)
-
+    df = df.loc[df['source'] == source]
     return jsonify({
         'description_scores': list(df['description_compound']),
-        'title_scores': list(df['title_compound'])
+        'title_scores': list(df['title_compound']),
+        'source': list(df['source']),
+        'publish_date': list(df['publishedAt'])
     })
 
 

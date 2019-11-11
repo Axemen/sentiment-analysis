@@ -9,8 +9,8 @@ class BarChart {
         if (!margin) {
             this.margin = {}
             this.margin.top = 10;
-            this.margin.right = 0;
-            this.margin.left = 20;
+            this.margin.right = 20;
+            this.margin.left = 30;
             this.margin.bottom = 20;
         } else {
             this.margin = margin;
@@ -50,7 +50,7 @@ class BarChart {
         // Appending Axis' to chartWrapper
         this.chartWrapper.append('g')
             .classed('x axis', true)
-            .style('font-size', '1rem');
+            .style('font-size', '.75rem');
         this.chartWrapper.append('g')
             .classed('y axis', true)
             .style('font-size', '1rem');
@@ -63,23 +63,28 @@ class BarChart {
 
         this.width = parseInt(this.parentElement.style('width')) - this.margin.left - this.margin.right;
         this.height = parseInt(this.parentElement.style('height'));
-        // this.width = 1.25 * this.height;
+
+        if (this.width > this.height*1.5){
+            this.width = this.height*1.5;
+        }
 
         this.svg
             .attr('width', this.width + this.margin.left + this.margin.right)
-            .attr('height', this.height + this.margin.top + this.margin.bottom);
+            .attr('height', this.height + this.margin.top + this.margin.bottom)
+            
         this.chartWrapper.attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
 
         this.xScale.range([0, this.width]);
         this.yScale.range([this.height, 0]);
 
-        this.xAxis.scale(this.xScale);
+        let ticks = this.xScale.domain().filter(function(d,i){ return !(i%10); } );
+        this.xAxis.scale(this.xScale).tickValues(ticks);
         this.yAxis.scale(this.yScale);
 
 
         this.svg.select('.x.axis')
             .transition()
-            .attr('transform', `translate(0, ${this.yScale(0)})`)
+            .attr('transform', `translate(0, ${this.height})`)
             .call(this.xAxis);
         this.svg.select('.y.axis')
             .transition()

@@ -1,29 +1,29 @@
-class MultiLine {
+class scatterPlot {
 
-    constructor(cssID, traces, margin = null) {
+    constructor(cssID, traces = null, margin = null) {
 
         // Assign arguments to the object. 
         this.cssID = cssID;
         this.svg = d3.select(`#${cssID}`).append('svg');
-        this.traces = traces;
         // If margin is null (no argument given) set a default margin
         if (!margin) {
             this.margin = {}
             this.margin.top = 10;
-            this.margin.right = 50;
-            this.margin.left = 50;
+            this.margin.right = 20;
+            this.margin.left = 40;
             this.margin.bottom = 20;
         } else {
             this.margin = margin;
         }
+
         // Translate trace data to a proper data format for d3
-        // this.data = this.translateTraces(this.traces);
-        this.init();
+        this.traces = traces;
+        this.init()
     }
 
     init() {
-        this.extents = this.getExtentOfCurrentTraces();
-        this.xScale = d3.scaleLinear()
+        this.extents = this.getExtentOfTraces(this.traces);
+        this.xScale = d3.scaleTime()
             .domain(this.extents.x);
         this.yScale = d3.scaleLinear()
             .domain(this.extents.y);
@@ -31,10 +31,6 @@ class MultiLine {
 
         this.xAxis = d3.axisBottom();
         this.yAxis = d3.axisLeft();
-
-        this.line = d3.line()
-            .x(d => this.xScale(d.x))
-            .y(d => this.yScale(d.y));
 
         this.chartWrapper = this.svg.append('g');
         this.chartWrapper.append('g')
@@ -44,42 +40,42 @@ class MultiLine {
             .classed('y axis', true)
             .style('font-size', '1rem');
 
-        // Appending line at zero in order to show the negative values in a better light. 
         this.chartWrapper
             .append('line')
             .attr('class', 'zero-line')
 
-        // TODO: add Named Trace functionality.
-        this.traces.forEach((trace, i) => {
-            const traceData = this.getDataFromTrace(trace);
+        this.traces.forEach(trace => {
 
-            trace.path = this.chartWrapper
-                .datum(this.traceData)
-                .append('path')
-                .attr('class', `line ${trace.name}`);
+            let data = this.getDataFromTrace(trace);
+
+            this.chartWrapper.selectAll(`.${trace.name}`)
+                .data(data)
+                .enter()
+                .append('circle')
+                .attr('class', `circle ${trace.name}`);
         })
 
-        this.render()
+        this.render();
     }
 
     render() {
-
         this.parentElement = d3.select(`#${this.cssID}`);
 
         this.width = parseInt(this.parentElement.style('width')) - this.margin.left - this.margin.right;
         this.height = parseInt(this.parentElement.style('height'));
 
-        if (this.width > this.height*1.5){
-            this.width = this.height*1.5;
+        if (this.width > this.height * 1.5) {
+            this.width = this.height * 1.5;
         }
-
-        this.xScale.range([0, this.width]);
-        this.yScale.range([this.height, 0]);
 
         this.svg
             .attr('width', this.width + this.margin.left + this.margin.right)
-            .attr('height', this.height + this.margin.top + this.margin.bottom);
+            .attr('height', this.height + this.margin.top + this.margin.bottom)
+
         this.chartWrapper.attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
+
+        this.xScale.range([0, this.width]);
+        this.yScale.range([this.height, 0]);
 
         this.xAxis.scale(this.xScale);
         this.yAxis.scale(this.yScale);
@@ -91,8 +87,9 @@ class MultiLine {
         this.svg.select('.y.axis')
             .transition()
             .call(this.yAxis);
-        
-        // Transition zero-line
+
+        this.colorByName(this.traces.map(d => d.name));
+
         this.chartWrapper.select('.zero-line')
             .transition()
             .attr('x1', 0)
@@ -102,41 +99,56 @@ class MultiLine {
             .attr('stroke-width', 1)
             .attr('stroke', 'grey');
 
-        this.svg.selectAll('.line').style('stroke', (d, i) => this.color(i));
-
         this.traces.forEach(trace => {
-            const traceData = this.getDataFromTrace(trace);
-            trace.path
+            let data = this.getDataFromTrace(trace);
+
+            this.chartWrapper.selectAll(`.${trace.name}`)
+                .data(data)
                 .transition()
-                .attr('d', this.line(traceData));
+                .attr('cx', d => this.xScale(d.x))
+                .attr('cy', d => this.yScale(d.y))
+                .attr('r', '5px')
+                .style('fill', '5px');
         })
     }
 
     getDataFromTrace(trace) {
-        let traceData = [];
+
+        let newData = []
         for (let i = 0; i < trace.x.length; i++) {
             let d = {}
             d.x = trace.x[i];
             d.y = trace.y[i];
-            traceData.push(d);
+            newData.push(d);
         }
-        return traceData;
+        return newData;
     }
 
-    translateTraces(traces) {
-        let translatedTraces = [];
-        traces.forEach(trace => translatedTraces.push(this.getDataFromTrace(trace)));
-        return translatedTraces;
+    assert(condition, message) {
+        if (!condition) {
+            message = message || "Assertion failed";
+            if (typeof Error !== "undefined") {
+                throw new Error(message);
+            }
+            throw message; // Fallback
+        }
+    }
+
+    colorByName(names) {
+        names.forEach((name, i) => {
+            this.chartWrapper.selectAll(`.${name}`)
+                .style('fill', this.color(i))
+        })
     }
 
     getExtentOfTrace(trace) {
         return { x: d3.extent(trace.x), y: d3.extent(trace.y) };
     }
 
-    getExtentOfCurrentTraces() {
+    getExtentOfTraces(traces) {
         let extent = {}
-        for (let i = 0; i < this.traces.length; i++) {
-            let trace = this.traces[i];
+        for (let i = 0; i < traces.length; i++) {
+            let trace = traces[i];
             if (i == 0) {
                 extent = this.getExtentOfTrace(trace);
             } else {
@@ -158,35 +170,39 @@ class MultiLine {
     }
 
     addTrace(trace) {
-        console.log(trace);
-        // Assertions to make sure the code runs properly. 
-        this.assert(trace.name, 'Trace must have name!')
-        this.assert(!this.traces.map(d => d.name).includes(trace.name), 
-            'must have unique names!')
+        this.assert(trace.name, 'Trace must have a name!')
+        this.assert(!this.traces.map(d => d.name).includes(trace.name),
+            'Traces must have unique names!')
 
         this.traces.push(trace);
 
-        this.extents = this.getExtentOfCurrentTraces();
+        this.extents = this.getExtentOfTraces(this.traces);
         this.xScale.domain(this.extents.x);
         this.yScale.domain(this.extents.y);
 
         const traceData = this.getDataFromTrace(trace);
-        // console.log(traceData);
-        trace.path = this.chartWrapper
-            .datum(traceData)
-            .append('path')
-            .attr('class', `line ${trace.name}`);
+
+        this.chartWrapper.selectAll(`.${trace.name}`)
+            .data(traceData)
+            .enter()
+            .append('circle')
+            .attr('class', `circle ${trace.name}`)
+            .attr('cx', d => this.xScale(d.x))
+            .attr('cy', d => this.yScale(d.y))
+            .attr('r', '5px')
+        this.render()
+    }
+
+    removeTrace(traceName) {
+        this.traces = this.traces.filter(d => d.name != traceName)
+        this.svg.selectAll(`.${traceName}`).remove();
+
+        this.extents = this.getExtentOfTraces(this.traces);
+        this.xScale.domain(this.extents.x);
+        this.yScale.domain(this.extents.y);
 
         this.render();
     }
-    // Stolen from https://stackoverflow.com/questions/15313418/what-is-assert-in-javascript
-    assert(condition, message) {
-        if (!condition) {
-            message = message || "Assertion failed";
-            if (typeof Error !== "undefined") {
-                throw new Error(message);
-            }
-            throw message; // Fallback
-        }
-    }
+
+
 }
