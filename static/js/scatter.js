@@ -4,12 +4,12 @@ class scatterPlot {
      * @param {object} margin -> Takes in an object with the keys top, bottom, left, and right in order to have custom margin options. 
      */
     constructor(cssID, traces = null, margin = null) {
-
+        
         // Assign arguments to the object. 
         this.cssID = cssID;
         // Append svg and save selection to a variable. 
         this.svg = d3.select(`#${cssID}`).append('svg');
-        this.traces = traces;
+       
         // If margin is null (no argument given) set a default margin
         if (!margin) {
             this.margin = {}
@@ -20,7 +20,12 @@ class scatterPlot {
         } else {
             this.margin = margin;
         }
+        // Creatin the colorscale in order to color the traces in an appropriate order. 
+        this.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
+        traces.forEach((trace, i) => this.assert(trace.name, `Trace at index ${i} does not have a name!`))
+        this.traces = traces;
+        traces.forEach((trace, i) => this.checkTrace(trace))
 
         // Calls the init function to initialize the graph.
         this.init()
@@ -37,8 +42,7 @@ class scatterPlot {
             .domain(this.extents.x);
         this.yScale = d3.scaleLinear()
             .domain(this.extents.y);
-        // Creatin the colorscale in order to color the traces in an appropriate order. 
-        this.color = d3.scaleOrdinal(d3.schemeCategory10);
+        
         // Creating the functions for the Axis' that will later be appended. 
         this.xAxis = d3.axisBottom();
         this.yAxis = d3.axisLeft();
@@ -104,7 +108,7 @@ class scatterPlot {
             .transition()
             .call(this.yAxis);
         // Color the traces based on their names. 
-        this.colorByName(this.traces.map(d => d.name));
+        // this.colorByName(this.traces.map(d => d.name));
         // Transition the zero-line to the new coordinates based on the new scales. 
         this.chartWrapper.select('.zero-line')
             .transition()
@@ -125,7 +129,7 @@ class scatterPlot {
                 .attr('cx', d => this.xScale(d.x))
                 .attr('cy', d => this.yScale(d.y))
                 .attr('r', '5px')
-                .style('fill', '5px');
+                .style('fill', trace.color);
         })
     }
     /**
@@ -159,18 +163,7 @@ class scatterPlot {
             throw message; // Fallback
         }
     }
-    /**
-     * Uses d3 to select the circles that have the class with the name given and then colors them based on the 
-     * color scale.
-     * 
-     * @param {Array} names -> Array of string that are the names
-     */
-    colorByName(names) {
-        names.forEach((name, i) => {
-            this.chartWrapper.selectAll(`.${name}`)
-                .style('fill', this.color(i))
-        })
-    }
+
     /**
      * Returns the extents of the current trace object both x and y
      * @param {Object} trace -> the trace object in which to check the extents. 
@@ -210,11 +203,14 @@ class scatterPlot {
      * @param {Object} trace -> The trace that you wish to be added. 
      */
     addTrace(trace) {
+
+        trace = this.checkTrace(trace);
         // Check that the incoming trace has a name and that said name is unique
         this.assert(trace.name, 'Trace must have a name!')
         this.assert(!this.traces.map(d => d.name).includes(trace.name),
             'Traces must have unique names!')
         // Append the trace to the Objects internal list of traces. 
+
         this.traces.push(trace);
         // Get the extents and check the set the domains of the Axis accordingly 
         this.extents = this.getExtentOfTraces(this.traces);
@@ -246,6 +242,23 @@ class scatterPlot {
         // renders the graph based on the new extents. 
         this.render();
     }
+    /**
+     * Sets default values for the trace if they do not yet exist and then returns the trace. 
+     * @param {Object} trace -> The trace which we wish to check. 
+     */
+    checkTrace(trace) {
 
+        let names = this.traces.map(d => d.name)
+        if(names.includes(trace.name)){
+            var traceIndex = names.indexOf(trace.name);
+        }else{
+            var traceIndex = this.traces.length;
+        }
 
+        if (!trace.color) {
+            trace.color = this.colorScale(traceIndex)
+        }
+
+        return trace;
+    }
 }

@@ -30,7 +30,8 @@ getRecords('cnn').then(data => {
     let trace = {
         x: data.map(d => d.publishedAt),
         y: data.map(d => d.title_compound),
-        name: 'cnn'
+        name: 'cnn',
+        color: colorBySource('cnn')
     }
 
     scatter = new scatterPlot('scatterPlot', [trace])
@@ -45,10 +46,35 @@ function updateScatterBySource(source) {
         let trace = {
             x: data.map(d => d.publishedAt),
             y: data.map(d => d.title_compound),
-            name: source
+            name: source,
+            color: colorBySource(source)
+
         }
         scatter.addTrace(trace);
     })
+}
+
+function colorBySource(source) {
+    let color = 'black';
+    switch (source) {
+        case 'cnn':
+            color = 'steelblue';
+            return color;
+        case 'nbc-news':
+            color = '#955196';
+            return color;
+        case 'bbc-news':
+            color = '#dd5182';
+            return color;
+        case 'fox-news':
+            color = '#ff6e54';
+            return color;
+        case 'associated-press':
+            color = '#ffa600';
+            return color;
+        default:
+            break;
+    }
 }
 
 
@@ -57,7 +83,6 @@ d3.select('#scatter-checkboxes')
     .on('click', handleCheckBox)
 
 function handleCheckBox() {
-    console.log(d3.event.target.name);
     if(d3.event.target.checked){
         updateScatterBySource(d3.event.target.name);
     }else{
