@@ -21,75 +21,62 @@ d3.select('#update').on('click', () => {
     scatter.removeTrace('cnn-scatter');
 })
 
-getRecords('cnn').then(data => {
+getRecordsBySource('cnn').then(data => {
 
     data.forEach(d => d.publishedAt = parseTime(d.publishedAt));
     data.sort((a, b) => a.publishedAt - b.publishedAt);
     data.forEach(d => formatTime(d.publishedAt));
 
-    let trace = {
+    let titleTrace = {
         x: data.map(d => d.publishedAt),
         y: data.map(d => d.title_compound),
         name: 'cnn',
         color: colorBySource('cnn')
     }
+    let descTrace = {
+        x: data.map(d => d.publishedAt),
+        y: data.map(d => d.description_compound),
+        name: 'cnn',
+        color: colorBySource('cnn')
+    }
 
-    scatter = new scatterPlot('scatterPlot', [trace])
-
+    titleScatter = new scatterPlot('scatterPlot', [titleTrace]);
+    descScatter = new scatterPlot('scatterPlotDesc', [descTrace])
 });
 
-function updateScatterBySource(source) {
-    getRecords(source).then(data => {
-        data.forEach(d => d.publishedAt = parseTime(d.publishedAt));
-        data.sort((a, b) => a.publishedAt - b.publishedAt);
+getRecords().then(data => {
 
-        let trace = {
-            x: data.map(d => d.publishedAt),
-            y: data.map(d => d.title_compound),
-            name: source,
-            color: colorBySource(source)
+    cnnRecords = data.filter(d => d.source === 'cnn');
+    nbcRecords =data.filter(d => d.source === 'nbc-news');
+    bbcRecords = data.filter(d => d.source === 'bbc-news');
+    foxRecords = data.filter(d => d.source === 'fox-news');
+    apRecords = data.filter(d => d.source === 'associated-press');
 
-        }
-        scatter.addTrace(trace);
-    })
-}
-
-function colorBySource(source) {
-    let color = 'black';
-    switch (source) {
-        case 'cnn':
-            color = 'steelblue';
-            return color;
-        case 'nbc-news':
-            color = '#955196';
-            return color;
-        case 'bbc-news':
-            color = '#dd5182';
-            return color;
-        case 'fox-news':
-            color = '#ff6e54';
-            return color;
-        case 'associated-press':
-            color = '#ffa600';
-            return color;
-        default:
-            break;
+    let barTrace = {
+        x: ['CNN', 'NBC', 'BBC', 'FOX', 'AP'],
+        y: [
+            d3.mean(cnnRecords, d => d.description_compound),
+            d3.mean(nbcRecords, d => d.description_compound),
+            d3.mean(bbcRecords, d => d.description_compound),
+            d3.mean(foxRecords, d => d.description_compound),
+            d3.mean(apRecords, d => d.description_compound)
+        ]
     }
-}
+
+    bar = new BarChart('barChart', barTrace);
+    
+})
+
+
 
 
 d3.select('#scatter-checkboxes')
     .selectAll('input')
     .on('click', handleCheckBox)
 
-function handleCheckBox() {
-    if(d3.event.target.checked){
-        updateScatterBySource(d3.event.target.name);
-    }else{
-        scatter.removeTrace(d3.event.target.name);
-    }
-}
+
 
 window.addEventListener('resize', () => {
-    scatter.render();
+    titleScatter.render();
+    descScatter.render();
 })

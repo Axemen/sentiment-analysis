@@ -17,6 +17,7 @@ class BarChart {
         }
         
         // Translate trace data to a proper data format for d3
+        this.trace = trace;
         this.data = this.getDataFromTrace(trace);
         this.init()
     }
@@ -30,16 +31,15 @@ class BarChart {
         }
 
         this.xScale = d3.scaleBand()
-            .domain(this.data.map(d => d.x))
+            .domain(this.trace.x)
             .padding(0.1);
         this.yScale = d3.scaleLinear()
             .domain(this.yExtent);
 
-        this.xAxis = d3.axisBottom().ticks(11);
+        this.xAxis = d3.axisBottom().ticks(this.trace.x.length);
         this.yAxis = d3.axisLeft();
 
         this.chartWrapper = this.svg.append('g');
-
 
         this.chartWrapper.selectAll('rect')
             .data(this.data)
@@ -50,10 +50,8 @@ class BarChart {
         // Appending Axis' to chartWrapper
         this.chartWrapper.append('g')
             .classed('x axis', true)
-            .style('font-size', '.75rem');
         this.chartWrapper.append('g')
             .classed('y axis', true)
-            .style('font-size', '1rem');
 
         this.render()
     }
@@ -77,7 +75,7 @@ class BarChart {
         this.xScale.range([0, this.width]);
         this.yScale.range([this.height, 0]);
 
-        let ticks = this.xScale.domain().filter(function(d,i){ return !(i%10); } );
+        let ticks = this.xScale.domain();
         this.xAxis.scale(this.xScale).tickValues(ticks);
         this.yAxis.scale(this.yScale);
 

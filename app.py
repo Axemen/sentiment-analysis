@@ -45,6 +45,13 @@ def get_sentiment_scores(source):
         'publish_date': list(df['publishedAt'])
     })
 
+@app.route('/get-records')
+def get_records():
+    stmt = db.session.query(Headlines).statement
+    df = pd.read_sql_query(stmt, db.session.bind)
+
+    return jsonify(df.to_dict('records'))
+
 
 @app.route('/get-records/<source>')
 def get_records_source(source):

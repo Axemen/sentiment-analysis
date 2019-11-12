@@ -4,12 +4,12 @@ class scatterPlot {
      * @param {object} margin -> Takes in an object with the keys top, bottom, left, and right in order to have custom margin options. 
      */
     constructor(cssID, traces = null, margin = null) {
-        
+
         // Assign arguments to the object. 
         this.cssID = cssID;
         // Append svg and save selection to a variable. 
         this.svg = d3.select(`#${cssID}`).append('svg');
-       
+
         // If margin is null (no argument given) set a default margin
         if (!margin) {
             this.margin = {}
@@ -41,8 +41,9 @@ class scatterPlot {
         this.xScale = d3.scaleTime()
             .domain(this.extents.x);
         this.yScale = d3.scaleLinear()
-            .domain(this.extents.y);
-        
+            // .domain(this.extents.y);
+            .domain([-1, 1]);
+
         // Creating the functions for the Axis' that will later be appended. 
         this.xAxis = d3.axisBottom();
         this.yAxis = d3.axisLeft();
@@ -51,10 +52,10 @@ class scatterPlot {
         // Appending the Axis' to the chartWrapper and doing a bit of styling. 
         this.chartWrapper.append('g')
             .classed('x axis', true)
-            .style('font-size', '1rem');
+        // .style('font-size', '1rem');
         this.chartWrapper.append('g')
             .classed('y axis', true)
-            .style('font-size', '1rem');
+        // .style('font-size', '1rem');
         // Appending a line that will sit on zero in case of negative values being plotted. (If there are no negative values it will merge with the x-axis.)
         this.chartWrapper
             .append('line')
@@ -68,7 +69,8 @@ class scatterPlot {
                 .data(data) // Bind the trace data to the selection 
                 .enter()    // .enter the selection to specify the elements that don't yet exist in the dom. 
                 .append('circle')   // Append circles to each of the elements that have yet to be created.
-                .attr('class', `circle ${trace.name}`); // Assign the class circle and trace.name to the individual circles for future selection needs. 
+                .attr('class', `circle ${trace.name}`) // Assign the class circle and trace.name to the individual circles for future selection needs.
+
         })
 
         this.render();
@@ -215,7 +217,7 @@ class scatterPlot {
         // Get the extents and check the set the domains of the Axis accordingly 
         this.extents = this.getExtentOfTraces(this.traces);
         this.xScale.domain(this.extents.x);
-        this.yScale.domain(this.extents.y);
+        // this.yScale.domain(this.extents.y);
         // Translate the data from the trace into the required d3 format.
         const traceData = this.getDataFromTrace(trace);
         // Append the new trace to the chartWrapper
@@ -224,6 +226,8 @@ class scatterPlot {
             .enter()
             .append('circle')
             .attr('class', `circle ${trace.name}`)
+            .attr('cx', this.width * .6)
+            .attr('cy', this.height * .5)
         // Call the render function to allow actually render the new circles on the screen. 
         this.render()
     }
@@ -234,11 +238,23 @@ class scatterPlot {
     removeTrace(traceName) {
         // filters out the trace with the specified name and removes it from the graph 
         this.traces = this.traces.filter(d => d.name != traceName)
-        this.svg.selectAll(`.${traceName}`).remove();
-        // Reset the extents and domain to adjust the graph to existing values 
-        this.extents = this.getExtentOfTraces(this.traces);
-        this.xScale.domain(this.extents.x);
-        this.yScale.domain(this.extents.y);
+        this.svg.selectAll(`.${traceName}`)
+            .transition()
+            .attr('cx', this.width * .6)
+            .attr('cy', this.height * .5)
+            .remove();
+
+        try {
+
+            // Reset the extents and domain to adjust the graph to existing values 
+            this.extents = this.getExtentOfTraces(this.traces);
+            this.xScale.domain(this.extents.x);
+            // this.yScale.domain(this.extents.y);
+
+        } catch (TypeError) {
+
+        }
+
         // renders the graph based on the new extents. 
         this.render();
     }
@@ -249,9 +265,9 @@ class scatterPlot {
     checkTrace(trace) {
 
         let names = this.traces.map(d => d.name)
-        if(names.includes(trace.name)){
+        if (names.includes(trace.name)) {
             var traceIndex = names.indexOf(trace.name);
-        }else{
+        } else {
             var traceIndex = this.traces.length;
         }
 
