@@ -21,6 +21,32 @@ function updateScattersBySource(source) {
     })
 }
 
+function updateBarsBySources(sources) {
+    getCountsSources(sources).then(data => {
+        let titleCounts = Object.entries(data.title_counts).map(d => {
+            return { word: d[0], count: d[1] };
+        }).sort((a, b) => b.count - a.count)
+            .filter(d => !badWords.includes(d.word));
+
+        let descCounts = Object.entries(data.description_counts).map(d => {
+            return { word: d[0], count: d[1] };
+        }).sort((a, b) => b.count - a.count)
+            .filter(d => !badWords.includes(d.word));
+
+        let titleTrace = {
+            x: titleCounts.map(d => d.word).slice(0, 10),
+            y: titleCounts.map(d => d.count).slice(0, 10)
+        }
+        let descTrace = {
+            x: descCounts.map(d => d.word).slice(0, 10),
+            y: descCounts.map(d => d.count).slice(0, 10)
+        }
+
+        titleCountBar.updateBars(titleTrace);
+        descCountBar.updateBars(descTrace);
+    })
+}
+
 function colorBySource(source) {
     let color = 'black';
     switch (source) {
@@ -45,10 +71,25 @@ function colorBySource(source) {
 }
 
 function handleCheckBox() {
+    name = d3.event.target.name
     if (d3.event.target.checked) {
-        updateScattersBySource(d3.event.target.name);
+        updateScattersBySource(name);
+        sources.push(name);
+        updateBarsBySources(sources);
     } else {
-        titleScatter.removeTrace(d3.event.target.name);
-        descScatter.removeTrace(d3.event.target.name);
+        titleScatter.removeTrace(name);
+        descScatter.removeTrace(name);
+        sources.splice(sources.indexOf(name), 1);
+        updateBarsBySources(sources);
     }
+}
+
+function filterWords(data) {
+    
+    return data.filter(d => {
+        if(!badWords.includes(d.word)){
+            return 0
+        }
+        return 1
+    })
 }

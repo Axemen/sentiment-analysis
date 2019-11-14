@@ -1,25 +1,7 @@
 
 let parseTime = d3.timeParse('%Y-%m-%dT%H:%M:%SZ');
 let formatTime = d3.timeFormat('%H:%M');
-
-let trace = {
-    x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    y: [0, 1, 2, 3, 4, -1, -2, -3, -4, -3],
-    name: 'trace1'
-}
-
-let trace2 = {
-    x: [0, 1, 2],
-    y: [-1, -2, -3],
-    name: 'trace2'
-}
-
-// let scatter = new scatterPlot('BarChart', [trace]);
-
-d3.select('#update').on('click', () => {
-    // updateScatterBySource('nbc-news');
-    scatter.removeTrace('cnn-scatter');
-})
+let badWords = [' ', '...', "…"]
 
 getRecordsBySource('cnn').then(data => {
 
@@ -46,37 +28,88 @@ getRecordsBySource('cnn').then(data => {
 
 getRecords().then(data => {
 
-    cnnRecords = data.filter(d => d.source === 'cnn');
-    nbcRecords =data.filter(d => d.source === 'nbc-news');
-    bbcRecords = data.filter(d => d.source === 'bbc-news');
-    foxRecords = data.filter(d => d.source === 'fox-news');
-    apRecords = data.filter(d => d.source === 'associated-press');
+    let sources = ['cnn', 'nbc-news', 'bbc-news', 'fox-news', 'associated-press'];
+    let titleTrace = [];
+    let descTrace = [];
+    sources.forEach(source => {
+        let filteredData = data.filter(d => d.source === source)
+        let titleCounts = {
+            source: source,
+            pos: 0,
+            neg: 0
+        };
+        let descCounts = {
+            source: source,
+            pos: 0,
+            neg: 0
+        };
+        filteredData.forEach(d => {
+            if (d.title_compound > 0) {
+                titleCounts.pos += 1;
+            }else if (d.title_compound < 0) {
+                titleCounts.neg += 1;
+            }
+            if (d.description_compound > 0) {
+                descCounts.pos += 1;
+            }else if (d.description_compound < 0) {
+                descCounts.neg += 1;
+            }
 
-    let barTrace = {
-        x: ['CNN', 'NBC', 'BBC', 'FOX', 'AP'],
-        y: [
-            d3.mean(cnnRecords, d => d.description_compound),
-            d3.mean(nbcRecords, d => d.description_compound),
-            d3.mean(bbcRecords, d => d.description_compound),
-            d3.mean(foxRecords, d => d.description_compound),
-            d3.mean(apRecords, d => d.description_compound)
-        ]
-    }
+        })
+        titleTrace.push(titleCounts);
+        descTrace.push(descCounts);
+    })
 
-    bar = new BarChart('barChart', barTrace);
-    
+    titleBar = new MultiBar('posBarChart', titleTrace);
+    descBar = new MultiBar('negBarChart', descTrace)
 })
 
+getCounts('cnn').then(data => {
+    // console.log(data);
+
+    let titleCounts = Object.entries(data.title_counts).map(d => {
+        return {word: d[0], count: d[1]};
+    })
+        .sort((a, b) => b.count-a.count)
+        .filter(d => !badWords.includes(d.word));
+    let descCounts = Object.entries(data.description_counts).map(d => {
+        return {word: d[0], count: d[1]};
+    })
+        .sort((a, b) => b.count-a.count)
+        .filter(d => !badWords.includes(d.word));
 
 
+
+    let titleTrace = {
+        x: titleCounts.map(d => d.word).slice(0, 10),
+        y: titleCounts.map(d => d.count).slice(0, 10)
+    }
+    let descTrace = {
+        x: descCounts.map(d => d.word).slice(0, 10),
+        y: descCounts.map(d => d.count).slice(0, 10)
+    }
+
+
+    titleCountBar = new BarChart('titleWordCountBar', titleTrace);
+    descCountBar = new BarChart('descWordCountBar', descTrace);
+
+    // console.log(descCounts);
+})
+
+sources = ['cnn']
 
 d3.select('#scatter-checkboxes')
     .selectAll('input')
-    .on('click', handleCheckBox)
+    .on('click', handleCheckBox);
 
 
 
 window.addEventListener('resize', () => {
     titleScatter.render();
     descScatter.render();
+    titleBar.render();
+    descBar.render();
+    titleCountBar.render();
+    descCountBar.render();
 })
+

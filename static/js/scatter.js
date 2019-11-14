@@ -83,12 +83,12 @@ class scatterPlot {
         this.parentElement = d3.select(`#${this.cssID}`);
         // calculate the new svg width and height based on the parent elements width and height.
         this.width = parseInt(this.parentElement.style('width')) - this.margin.left - this.margin.right;
-        this.height = parseInt(this.parentElement.style('height'));
+        this.height = parseInt(this.parentElement.style('height')) - this.margin.top - this.margin.bottom;
         // If the width is big enough to distort the viewing of the graph set the width to be 1.5x the height of the graph
         // Giving us a functionality of an aspect ratio. 
-        if (this.width > this.height * 1.5) {
-            this.width = this.height * 1.5;
-        }
+        // if (this.width > this.height * 1.5) {
+        //     this.width = this.height * 1.5;
+        // }
         // Reset the svg's width and height to the values previously gotten from the parentElemnt. 
         this.svg
             .attr('width', this.width + this.margin.left + this.margin.right)

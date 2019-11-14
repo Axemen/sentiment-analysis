@@ -1,6 +1,7 @@
 class BarChart {
 
     constructor(cssID, trace, margin = null) {
+        
 
         // Assign arguments to the object. 
         this.cssID = cssID;
@@ -15,11 +16,11 @@ class BarChart {
         } else {
             this.margin = margin;
         }
-        
         // Translate trace data to a proper data format for d3
-        this.trace = trace;
+        this.traceValue = trace;
         this.data = this.getDataFromTrace(trace);
         this.init()
+        
     }
 
     init() {
@@ -31,12 +32,12 @@ class BarChart {
         }
 
         this.xScale = d3.scaleBand()
-            .domain(this.trace.x)
+            .domain(this.trace().x)
             .padding(0.1);
         this.yScale = d3.scaleLinear()
             .domain(this.yExtent);
 
-        this.xAxis = d3.axisBottom().ticks(this.trace.x.length);
+        this.xAxis = d3.axisBottom().ticks(this.trace().x.length);
         this.yAxis = d3.axisLeft();
 
         this.chartWrapper = this.svg.append('g');
@@ -60,7 +61,7 @@ class BarChart {
         this.parentElement = d3.select(`#${this.cssID}`);
 
         this.width = parseInt(this.parentElement.style('width')) - this.margin.left - this.margin.right;
-        this.height = parseInt(this.parentElement.style('height'));
+        this.height = parseInt(this.parentElement.style('height')) - this.margin.top - this.margin.bottom;
 
         if (this.width > this.height*1.5){
             this.width = this.height*1.5;
@@ -100,8 +101,11 @@ class BarChart {
     }
 
     updateBars(newTrace) {
-
-        this.data = this.getDataFromTrace(newTrace);
+        if(newTrace){
+            this.data = this.getDataFromTrace(newTrace);
+        }else {
+            this.data = this.getDataFromTrace(this.trace());
+        }
 
         this.yExtent = d3.extent(this.data, d => d.y);
 
@@ -142,6 +146,18 @@ class BarChart {
             return 'steelblue';
         }
         return 'darkorange';
+    }
+
+    xScale = (_) => {
+        if(!_) return this.xScale;
+        this.xScale = _;
+        return this;
+    }
+
+    trace = (_) => {
+        if(!_) return this.traceValue;
+        this.traceValue = _;
+        return this;
     }
 }
 

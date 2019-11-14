@@ -7,14 +7,45 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
     <!-- Darkly Css file -->
     <link rel="stylesheet" href="../static/css/bootstrap.min.css">
     <link rel="stylesheet" href="../static/css/style.css">
 </head>
 
 <body>
+
+    <nav class="navbar navbar-defualt fixed-top bg-dark">
+        <div class="container">
+            <div id="scatter-checkboxes" class='mx-auto'>
+                <div class="form-check form-check-inline">
+                    <input class="scatter-checkbox" type="checkbox" name="cnn" id="cnn-checkbox-scatter" checked>
+                    <label for="cnn"> cnn</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="scatter-checkbox" type="checkbox" name="nbc-news" id="nbc-news-checkbox-scatter">
+                    <label for="nbc-news"> nbc-news</label></div>
+                <div class="form-check form-check-inline">
+                    <input class="scatter-checkbox" type="checkbox" name="bbc-news" id="bbc-news-checkbox-scatter">
+                    <label for="bbc-news"> bbc-news</label></div>
+                <div class="form-check form-check-inline">
+                    <input class="scatter-checkbox" type="checkbox" name="fox-news" id="fox-news-checkbox-scatter">
+                    <label for="fox-news"> fox-news</label></div>
+                <div class="form-check form-check-inline">
+                    <input class="scatter-checkbox" type="checkbox" name="associated-press" id="ap-checkbox-scatter">
+                    <label for="associated-press"> associated-press</label></div>
+            </div>
+        </div>
+    </nav>
 
     <div class="banner">
         <div class="row">
@@ -39,61 +70,70 @@
         <div class="row">
             <div class="col-lg-3"></div>
             <div class="col-lg-6">
-                <div id="scatter-checkboxes" class = 'mx-auto'>
-                    <div class="form-check form-check-inline">
-                        <input class="scatter-checkbox" type="checkbox" name="cnn" id="cnn-checkbox-scatter" checked>
-                        <label for="cnn"> cnn</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="scatter-checkbox" type="checkbox" name="nbc-news" id="nbc-news-checkbox-scatter">
-                        <label for="nbc-news"> nbc-news</label></div>
-                    <div class="form-check form-check-inline">
-                        <input class="scatter-checkbox" type="checkbox" name="bbc-news" id="bbc-news-checkbox-scatter">
-                        <label for="bbc-news"> bbc-news</label></div>
-                    <div class="form-check form-check-inline">
-                        <input class="scatter-checkbox" type="checkbox" name="fox-news" id="fox-news-checkbox-scatter">
-                        <label for="fox-news"> fox-news</label></div>
-                    <div class="form-check form-check-inline">
-                        <input class="scatter-checkbox" type="checkbox" name="associated-press"
-                            id="ap-checkbox-scatter">
-                        <label for="associated-press"> associated-press</label></div>
-                </div>
+
 
             </div>
             <div class="col-lg-3"></div>
         </div>
     </div>
+
     <div class="row">
-        <div class="col-lg-6 col-md-8 col-sm-12">
+        <div class="col-lg-6 col-md-6 col-sm-12">
             <h5 class="text-center">Title Sentiment Scores</h5>
             <div class='chart' id="scatterPlot"></div>
         </div>
-        <div class="col-lg-6">
-                <h5 class="text-center">Description Sentiment Scores</h5>
+        <div class="col-lg-6 col-md-6">
+            <h5 class="text-center">Description Sentiment Scores</h5>
             <div class="chart" id="scatterPlotDesc"></div>
         </div>
     </div>
     <br>
     <div class="row">
-        <div class="col-lg-12 col-md-12 mx-auto">Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti
-            vero maxime numquam
-            omnis aliquam quae saepe itaque ipsam natus reprehenderit. Ex, aspernatur quis tenetur id asperiores
-            impedit nam enim itaque!
+        <div class="col-lg-12 col-md-12 mx-auto">
+            <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti
+                vero maxime numquam
+                omnis aliquam quae saepe itaque ipsam natus reprehenderit. Ex, aspernatur quis tenetur id asperiores
+                impedit nam enim itaque!
+            </p>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <h5 class="text-center">Pos/Neg Counts for titles</h5>
+            <div class='chart' id="posBarChart"></div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <h5 class="text-center">Pos/Neg Counts for descriptions</h5>
+            <div class="chart" id='negBarChart'></div>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-2 col-lg-2"></div>
-        <div class="col-lg-8 col-md-8 col-sm-12">
-            <div class='chart' id="barChart"></div>
+        <div class="col-md-6">
+            <h5 class='text-center'>Title Word Counts</h5>
+            <div class='chart' id="titleWordCountBar"></div>
         </div>
-        <div class="col-lg-2 col-md-2"></div>
+        <div class="col-md-6">
+            <h5 class='text-center'>Description Word Counts</h5>
+            <div class='chart' id="descWordCountBar"></div>
+        </div>
+    </div>
 
+    <div class="row">
+        <div class="col-md-12">
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem sunt unde at architecto, repudiandae
+                praesentium aspernatur laborum voluptatum inventore aliquid natus, commodi doloribus cum ipsum,
+                voluptates deleniti. Distinctio, tempore suscipit.</p>
+        </div>
     </div>
-    </div>
+
+
     <script src="../static/js/scatter.js"></script>
     <script src="../static/js/fetches.js"></script>
     <script src="../static/js/bar.js"></script>
     <script src="../static/js/multi-line.js"></script>
+    <script src="../static/js/multibar.js"></script>
     <script src="../static/js/logicFunctions.js"></script>
     <script src="../static/js/logic.js"></script>
 </body>

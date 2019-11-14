@@ -14,7 +14,6 @@ stop_words = set(stopwords.words('english'))
 nlp = en_core_web_sm.load()
 
 def remove_stop_words(input_string):
-
     # Remove punctuation using translate function
     input_string = input_string.translate(
         str.maketrans('', '', punctuation + digits))

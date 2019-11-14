@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, redirect
 from flask_sqlalchemy import SQLAlchemy
 
 import pandas as pd
@@ -74,7 +74,7 @@ def get_new_headlines():
     db.engine.execute(
         'ALTER TABLE public."headlines" ADD PRIMARY KEY ("index");')
 
-    return jsonify(df.to_dict('records'))
+    return redirect('/', code=302)
 
 
 @app.route('/get-counts')
@@ -93,8 +93,9 @@ def get_counts():
 
 @app.route('/get-counts/<source>')
 def get_counts_source(source):
-    stmt = db.session.query(Headlines).filter(
-        Headlines.source == source).statement
+    stmt = db.session.query(Headlines)\
+    .filter(Headlines.source == source)\
+        .statement
     df = pd.read_sql_query(stmt, db.session.bind)
 
     title_counts = count_words(df['title'])
@@ -104,6 +105,27 @@ def get_counts_source(source):
         'title_counts': dict(title_counts.most_common(50)),
         'description_counts': dict(desc_counts.most_common(50))
     })
+
+@app.route('/get-counts/sources/<sources>')
+def get_counts_sources(sources):
+    sources = sources.split(',')
+
+    stmt = db.session.query(Headlines)\
+        .filter(Headlines.source.in_(sources))\
+        .statement
+    df = pd.read_sql_query(stmt, db.session.bind)
+
+    title_counts = count_words(df['title'])
+    desc_counts = count_words(df['description'])
+
+    return jsonify({
+        'title_counts': dict(title_counts.most_common(50)),
+        'description_counts': dict(desc_counts.most_common(50))
+    })
+
+@app.route('/test')
+def test():
+    return render_template('test.html')
 
 
 if __name__ == '__main__':

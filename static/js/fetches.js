@@ -15,3 +15,8 @@ async function getCounts(source) {
     response = d3.json(`/get-counts/${source}`);
     return await response;
 }
+
+async function getCountsSources(sources) {
+    response = d3.json(`/get-counts/sources/${sources.join()}`);
+    return await response;
+}
