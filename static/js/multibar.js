@@ -9,7 +9,7 @@ class MultiBar {
             this.margin.top = 10;
             this.margin.right = 20;
             this.margin.left = 30;
-            this.margin.bottom = 20;
+            this.margin.bottom = 40;
         } else {
             this.margin = margin;
         }

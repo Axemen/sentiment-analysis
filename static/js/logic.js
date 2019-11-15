@@ -46,12 +46,12 @@ getRecords().then(data => {
         filteredData.forEach(d => {
             if (d.title_compound > 0) {
                 titleCounts.pos += 1;
-            }else if (d.title_compound < 0) {
+            } else if (d.title_compound < 0) {
                 titleCounts.neg += 1;
             }
             if (d.description_compound > 0) {
                 descCounts.pos += 1;
-            }else if (d.description_compound < 0) {
+            } else if (d.description_compound < 0) {
                 descCounts.neg += 1;
             }
 
@@ -68,14 +68,14 @@ getCounts('cnn').then(data => {
     // console.log(data);
 
     let titleCounts = Object.entries(data.title_counts).map(d => {
-        return {word: d[0], count: d[1]};
+        return { word: d[0], count: d[1] };
     })
-        .sort((a, b) => b.count-a.count)
+        .sort((a, b) => b.count - a.count)
         .filter(d => !badWords.includes(d.word));
     let descCounts = Object.entries(data.description_counts).map(d => {
-        return {word: d[0], count: d[1]};
+        return { word: d[0], count: d[1] };
     })
-        .sort((a, b) => b.count-a.count)
+        .sort((a, b) => b.count - a.count)
         .filter(d => !badWords.includes(d.word));
 
 
@@ -88,10 +88,16 @@ getCounts('cnn').then(data => {
         x: descCounts.map(d => d.word).slice(0, 10),
         y: descCounts.map(d => d.count).slice(0, 10)
     }
+    margin = {
+        top: 40,
+        bottom: 100,
+        left: 20,
+        right: 20
+    }
 
+    titleCountBar = new BarChart('titleWordCountBar', titleTrace, margin);
+    descCountBar = new BarChart('descWordCountBar', descTrace, margin);
 
-    titleCountBar = new BarChart('titleWordCountBar', titleTrace);
-    descCountBar = new BarChart('descWordCountBar', descTrace);
 
     // console.log(descCounts);
 })
@@ -102,8 +108,6 @@ d3.select('#scatter-checkboxes')
     .selectAll('input')
     .on('click', handleCheckBox);
 
-
-
 window.addEventListener('resize', () => {
     titleScatter.render();
     descScatter.render();
@@ -112,4 +116,6 @@ window.addEventListener('resize', () => {
     titleCountBar.render();
     descCountBar.render();
 })
+
+
 

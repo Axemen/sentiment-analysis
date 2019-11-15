@@ -23,7 +23,21 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-defualt fixed-top bg-dark">
+
+
+    <div class="banner">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-lg-6 col-md-6">
+                <h1 class='text-center' style="padding-top: 10px">Headline Analysis</h1>
+                <br>
+                <h3 class="header-text text-center">A series of vizualizations regarding the last 100 news articles
+                    published by CNN, NBC, BBC, FOX, and the Assosiated Press.</h3>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+    <nav class="navbar sticky-top navbar-dark">
         <div class="container">
             <div id="scatter-checkboxes" class='mx-auto'>
                 <div class="form-check form-check-inline">
@@ -46,24 +60,15 @@
         </div>
     </nav>
 
-    <div class="banner">
-        <div class="row">
-            <div class="col-lg-12 col-md-12">
-            </div>
-        </div>
-    </div>
+
 
     <div class="container">
         <div class="row">
-            <div class="col-lg-12 col-md-12">
-                <h1 id='header' class='text-center'>Headline Analysis</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-12 col-md-12 barchart-text">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Similique aliquid consectetur esse architecto
-                asperiores veritatis! Doloremque in magnam assumenda, possimus atque fugit laborum necessitatibus
-                molestiae numquam molestias corrupti ad quaerat.
+            <div class="col-lg-12 col-md-12 scatter-text">
+                <h3 class="text-center">
+                    The Scatter Plots represent the distribution of the articles over time (X-axis) and the score on the
+                    VADER Sentiment Intensitiy Analyzer (Y-axis)
+                </h3>
             </div>
         </div>
         <div class="row">
@@ -75,57 +80,63 @@
             <div class="col-lg-3"></div>
         </div>
     </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <h5 class="text-center">Title Sentiment Scores</h5>
+                <div class='chart' id="scatterPlot"></div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <h5 class="text-center">Description Sentiment Scores</h5>
+                <div class="chart" id="scatterPlotDesc"></div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 mx-auto">
+                <h3 class="text-center">
+                    This set of bar charts represents the number of articles that were positive (above 0) and negative
+                    (below 0).
+                </h3>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <h5 class="text-center">Pos/Neg Counts for titles</h5>
+                <div class='chart' id="posBarChart"></div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <h5 class="text-center">Pos/Neg Counts for descriptions</h5>
+                <div class="chart" id='negBarChart'></div>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 30px">
+            <div class="col-md-12">
+                <h3 class="text-center">
+                    These bar charts represent the most commonly used words in the titles and descriptions of the
+                    articles based on what news sources you have selected.
+                </h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class='text-center'>Title Word Counts</h5>
+                <div class='chart' id="titleWordCountBar"></div>
+            </div>
+            <div class="col-md-6">
+                <h5 class='text-center'>Description Word Counts</h5>
+                <div class='chart' id="descWordCountBar"></div>
+            </div>
+        </div>
 
-    <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <h5 class="text-center">Title Sentiment Scores</h5>
-            <div class='chart' id="scatterPlot"></div>
-        </div>
-        <div class="col-lg-6 col-md-6">
-            <h5 class="text-center">Description Sentiment Scores</h5>
-            <div class="chart" id="scatterPlotDesc"></div>
-        </div>
-    </div>
-    <br>
-    <div class="row">
-        <div class="col-lg-12 col-md-12 mx-auto">
-            <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti
-                vero maxime numquam
-                omnis aliquam quae saepe itaque ipsam natus reprehenderit. Ex, aspernatur quis tenetur id asperiores
-                impedit nam enim itaque!
-            </p>
-        </div>
-    </div>
-    <br>
-    <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <h5 class="text-center">Pos/Neg Counts for titles</h5>
-            <div class='chart' id="posBarChart"></div>
-        </div>
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <h5 class="text-center">Pos/Neg Counts for descriptions</h5>
-            <div class="chart" id='negBarChart'></div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <h5 class='text-center'>Title Word Counts</h5>
-            <div class='chart' id="titleWordCountBar"></div>
-        </div>
-        <div class="col-md-6">
-            <h5 class='text-center'>Description Word Counts</h5>
-            <div class='chart' id="descWordCountBar"></div>
+        <div class="row" style="height: 100px;">
+            <div class="col-md-12">
+            </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem sunt unde at architecto, repudiandae
-                praesentium aspernatur laborum voluptatum inventore aliquid natus, commodi doloribus cum ipsum,
-                voluptates deleniti. Distinctio, tempore suscipit.</p>
-        </div>
-    </div>
+
 
 
     <script src="../static/js/scatter.js"></script>

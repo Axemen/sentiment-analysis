@@ -1,7 +1,7 @@
 class BarChart {
 
     constructor(cssID, trace, margin = null) {
-        
+
 
         // Assign arguments to the object. 
         this.cssID = cssID;
@@ -20,7 +20,7 @@ class BarChart {
         this.traceValue = trace;
         this.data = this.getDataFromTrace(trace);
         this.init()
-        
+
     }
 
     init() {
@@ -63,14 +63,14 @@ class BarChart {
         this.width = parseInt(this.parentElement.style('width')) - this.margin.left - this.margin.right;
         this.height = parseInt(this.parentElement.style('height')) - this.margin.top - this.margin.bottom;
 
-        if (this.width > this.height*1.5){
-            this.width = this.height*1.5;
-        }
+        // if (this.width > this.height*1.5){
+        //     this.width = this.height*1.5;
+        // }
 
         this.svg
             .attr('width', this.width + this.margin.left + this.margin.right)
             .attr('height', this.height + this.margin.top + this.margin.bottom)
-            
+
         this.chartWrapper.attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
 
         this.xScale.range([0, this.width]);
@@ -84,7 +84,14 @@ class BarChart {
         this.svg.select('.x.axis')
             .transition()
             .attr('transform', `translate(0, ${this.height})`)
-            .call(this.xAxis);
+            .call(this.xAxis)
+            .selectAll('text')
+            .attr('y', '0')
+            .attr('x', '9')
+            .attr('dy', '.35em')
+            .attr('transform', 'rotate(90)')
+            .style('text-anchor', 'start')
+            .style('font-size', '.8rem');
         this.svg.select('.y.axis')
             .transition()
             .call(this.yAxis);
@@ -101,9 +108,9 @@ class BarChart {
     }
 
     updateBars(newTrace) {
-        if(newTrace){
+        if (newTrace) {
             this.data = this.getDataFromTrace(newTrace);
-        }else {
+        } else {
             this.data = this.getDataFromTrace(this.trace());
         }
 
@@ -149,13 +156,13 @@ class BarChart {
     }
 
     xScale = (_) => {
-        if(!_) return this.xScale;
+        if (!_) return this.xScale;
         this.xScale = _;
         return this;
     }
 
     trace = (_) => {
-        if(!_) return this.traceValue;
+        if (!_) return this.traceValue;
         this.traceValue = _;
         return this;
     }

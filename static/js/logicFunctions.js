@@ -44,6 +44,7 @@ function updateBarsBySources(sources) {
 
         titleCountBar.updateBars(titleTrace);
         descCountBar.updateBars(descTrace);
+        
     })
 }
 
@@ -85,9 +86,9 @@ function handleCheckBox() {
 }
 
 function filterWords(data) {
-    
+
     return data.filter(d => {
-        if(!badWords.includes(d.word)){
+        if (!badWords.includes(d.word)) {
             return 0
         }
         return 1
