@@ -1,7 +1,7 @@
 
 let parseTime = d3.timeParse('%Y-%m-%dT%H:%M:%SZ');
 let formatTime = d3.timeFormat('%H:%M');
-let badWords = [' ', '...', "…"]
+let badWords = [' ', '...', "…", '’s', '—']
 
 getRecordsBySource('cnn').then(data => {
 
