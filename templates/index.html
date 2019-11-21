@@ -37,25 +37,25 @@
             <div class="col-md-3"></div>
         </div>
     </div>
-    <nav class="navbar sticky-top navbar-dark">
+    <!-- sticky-nav for buttons -->
+    <nav class="navbar sticky-top navbar-dark bg-secondary">
         <div class="container">
             <div id="scatter-checkboxes" class='mx-auto'>
-                <div class="form-check form-check-inline">
-                    <input class="scatter-checkbox" type="checkbox" name="cnn" id="cnn-checkbox-scatter" checked>
-                    <label for="cnn"> cnn</label>
+                <div class="form-check-inline">
+                    <button class='btn btn-success' id='cnn-checkbox-scatter'name="cnn">CNN</button>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="scatter-checkbox" type="checkbox" name="nbc-news" id="nbc-news-checkbox-scatter">
-                    <label for="nbc-news"> nbc-news</label></div>
-                <div class="form-check form-check-inline">
-                    <input class="scatter-checkbox" type="checkbox" name="bbc-news" id="bbc-news-checkbox-scatter">
-                    <label for="bbc-news"> bbc-news</label></div>
-                <div class="form-check form-check-inline">
-                    <input class="scatter-checkbox" type="checkbox" name="fox-news" id="fox-news-checkbox-scatter">
-                    <label for="fox-news"> fox-news</label></div>
-                <div class="form-check form-check-inline">
-                    <input class="scatter-checkbox" type="checkbox" name="associated-press" id="ap-checkbox-scatter">
-                    <label for="associated-press"> associated-press</label></div>
+                <div class="form-check-inline">
+                    <button class="btn btn-danger" id = 'nbc-news-checkbox-scatter' name="nbc-news">NBC</button>
+                </div>
+                <div class="form-check-inline">
+                    <button class="btn btn-danger" id="bbc-news-checkbox-scatter" name="bbc-news">BBC</button>
+                </div>
+                <div class="form-check-inline">
+                    <button class="btn btn-danger" id="fox-news-checkbox-scatter" name="fox-news">FOX</button>
+                </div>
+                <div class="form-check-inline">
+                    <button class="btn btn-danger" id="ap-checkbox-scatter" name="associated-press">AP</button>
+                </div>
             </div>
         </div>
     </nav>

@@ -5,7 +5,6 @@ import time
 
 import pandas as pd
 import spacy
-from newsapi import NewsApiClient
 
 import en_core_web_sm
 

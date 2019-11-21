@@ -4,9 +4,9 @@
 
 .banner {
     width: 100%;
-    height: 80vh;
-    /* background-image: url('../images/newspapers.jpg'); */
-    background: linear-gradient(0deg, rgb(34, 34, 34), rgba(140, 140, 140, 0.993));
+    height: 100vh;
+    background-image: url('../images/news-newsletter-newspaper-information-158651.jpeg');
+    /* background: linear-gradient(0deg, rgb(34, 34, 34), rgba(140, 140, 140, 0.993)); */
     padding-top: 6rem;
     padding-bottom: 2rem;
     /* min-height: 30rem; */
@@ -18,6 +18,7 @@
     height: 45vh;
     min-height: 400px;
 }
+
 .line {
     fill: none;
     stroke-width: 2px;
@@ -32,6 +33,3 @@ h5 {
     margin-top: 20px;
 }
 
-.navbar {
-    background-color: #222222;
-}

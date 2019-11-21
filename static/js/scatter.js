@@ -21,8 +21,9 @@ class scatterPlot {
             this.margin = margin;
         }
         // Creatin the colorscale in order to color the traces in an appropriate order. 
-        this.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
-
+        this.colorScale = d3.scaleOrdinal()
+            .domain(['#235789', '#ED1C24', '#F1D302', '#EC058E', '#85CB33']);
+ 
         traces.forEach((trace, i) => this.assert(trace.name, `Trace at index ${i} does not have a name!`))
         this.traces = traces;
         traces.forEach((trace, i) => this.checkTrace(trace))
@@ -134,6 +135,7 @@ class scatterPlot {
                 .style('fill', trace.color);
         })
     }
+
     /**
      * Translates the data from the current trace into a records based format for d3 consumption. 
      * 
@@ -276,5 +278,10 @@ class scatterPlot {
         }
 
         return trace;
+    }
+
+    updateAllTraces(newTraces) {
+        this.traces = newTraces;
+        this.render()
     }
 }

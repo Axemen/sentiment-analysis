@@ -1,3 +1,6 @@
+let titleTracesScatter = [];
+let descTracesScatter = [];
+
 function updateScattersBySource(source) {
     getRecordsBySource(source).then(data => {
         data.forEach(d => d.publishedAt = parseTime(d.publishedAt));
@@ -16,55 +19,61 @@ function updateScattersBySource(source) {
             color: colorBySource(source)
         }
 
-        titleScatter.addTrace(titleTrace);
-        descScatter.addTrace(descTrace);
+        titleTracesScatter.push(titleTrace);
+        descTracesScatter.push(descTrace);
+
+        // titleScatter.addTrace(titleTrace);
+        // descScatter.addTrace(descTrace);
     })
 }
 
 function updateBarsBySources(sources) {
-    getCountsSources(sources).then(data => {
-        let titleCounts = Object.entries(data.title_counts).map(d => {
-            return { word: d[0], count: d[1] };
-        }).sort((a, b) => b.count - a.count)
-            .filter(d => !badWords.includes(d.word));
 
-        let descCounts = Object.entries(data.description_counts).map(d => {
-            return { word: d[0], count: d[1] };
-        }).sort((a, b) => b.count - a.count)
-            .filter(d => !badWords.includes(d.word));
+    let data = filterCountDataBySources(sources);
 
-        let titleTrace = {
-            x: titleCounts.map(d => d.word).slice(0, 10),
-            y: titleCounts.map(d => d.count).slice(0, 10)
-        }
-        let descTrace = {
-            x: descCounts.map(d => d.word).slice(0, 10),
-            y: descCounts.map(d => d.count).slice(0, 10)
-        }
+    let titleCounts = Object.entries(data.title).map(d => {
+        return { word: d[0], count: d[1] };
+    }).sort((a, b) => b.count - a.count)
+        .filter(d => !badWords.includes(d.word));
 
-        titleCountBar.updateBars(titleTrace);
-        descCountBar.updateBars(descTrace);
-        
-    })
+    let descCounts = Object.entries(data.desc).map(d => {
+        return { word: d[0], count: d[1] };
+    }).sort((a, b) => b.count - a.count)
+        .filter(d => !badWords.includes(d.word));
+
+    let titleTrace = {
+        x: titleCounts.map(d => d.word).slice(0, 10),
+        y: titleCounts.map(d => d.count).slice(0, 10)
+    }
+    let descTrace = {
+        x: descCounts.map(d => d.word).slice(0, 10),
+        y: descCounts.map(d => d.count).slice(0, 10)
+    }
+
+    titleCountBar.updateBars(titleTrace);
+    descCountBar.updateBars(descTrace);
+
+
 }
 
 function colorBySource(source) {
     let color = 'black';
+    // ['#235789', '#ED1C24', '#F1D302', '#EC058E', '#00ff1e']
     switch (source) {
         case 'cnn':
-            color = 'steelblue';
+            color = '#00e1ff';
             return color;
         case 'nbc-news':
-            color = '#955196';
+            color = '#ED1C24';
             return color;
         case 'bbc-news':
-            color = '#dd5182';
+            color = '#F1D302';
             return color;
         case 'fox-news':
-            color = '#ff6e54';
+            color = '#EC058E';
             return color;
         case 'associated-press':
-            color = '#ffa600';
+            color = '#00ff1e';
             return color;
         default:
             break;
@@ -72,17 +81,29 @@ function colorBySource(source) {
 }
 
 function handleCheckBox() {
-    name = d3.event.target.name
-    if (d3.event.target.checked) {
+    // Gets the info for the current event target
+    let btn = d3.select(d3.event.target)
+    let btnClasses = btn.attr('class').split(' ')
+    let name = btn.attr('name')
+    if (btnClasses.includes('btn-danger')) {
+        btn.attr('class', 'btn btn-success')
         updateScattersBySource(name);
         sources.push(name);
         updateBarsBySources(sources);
     } else {
+        btn.attr('class', 'btn btn-danger')
+        sources.splice(sources.indexOf(name), 1);
         titleScatter.removeTrace(name);
         descScatter.removeTrace(name);
-        sources.splice(sources.indexOf(name), 1);
+
         updateBarsBySources(sources);
     }
+
+    // if (btnClasses.includes('btn-primary')) {
+    //     btn.attr('class', 'btn btn-warning')
+    // } else {
+    //     btn.attr('class', 'btn btn-primary')
+    // }
 }
 
 function filterWords(data) {
@@ -93,4 +114,33 @@ function filterWords(data) {
         }
         return 1
     })
+}
+
+function filterCountDataBySources(sources) {
+    let combined = {
+        title: {},
+        desc: {}
+    }
+
+    sources.forEach(source => {
+        Object.keys(countData[source].title)
+            .forEach(word => {
+                if (word in combined.title) {
+                    combined.title[word] += countData[source]['title'][word]
+                } else {
+                    combined.title[word] = countData[source]['title'][word]
+                }
+            })
+
+        Object.keys(countData[source].desc)
+            .forEach(word => {
+                if (word in combined.desc) {
+                    combined.desc[word] += countData[source]['desc'][word]
+                } else {
+                    combined.desc[word] = countData[source]['desc'][word]
+                }
+            })
+    })
+
+    return combined;
 }

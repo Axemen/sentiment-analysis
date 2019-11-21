@@ -119,9 +119,28 @@ def get_counts_sources(sources):
     desc_counts = count_words(df['description'])
 
     return jsonify({
-        'title_counts': dict(title_counts.most_common(50)),
-        'description_counts': dict(desc_counts.most_common(50))
+        'title': dict(title_counts.most_common(50)),
+        'desc': dict(desc_counts.most_common(50))
     })
+
+@app.route('/get-counts/allsources')
+def get_counts_all():
+    sources = ['cnn', 'nbc-news', 'bbc-news', 'fox-news', 'associated-press']
+
+    stmt = db.session.query(Headlines)\
+        .filter(Headlines.source.in_(sources))\
+        .statement
+    df = pd.read_sql_query(stmt, db.session.bind)
+
+    result_dict = {}
+
+    for source in sources:
+        temp = {}
+        temp['title'] = dict(count_words(df.loc[df['source'] == source]['title']).most_common(50))
+        temp['desc'] = dict(count_words(df.loc[df['source'] == source]['description']).most_common(50))
+        result_dict[source] = temp
+
+    return jsonify(result_dict)
 
 @app.route('/test')
 def test():

@@ -2,6 +2,7 @@
 let parseTime = d3.timeParse('%Y-%m-%dT%H:%M:%SZ');
 let formatTime = d3.timeFormat('%H:%M');
 let badWords = [' ', '...', "…", '’s', '—']
+let countData = {}
 
 getRecordsBySource('cnn').then(data => {
 
@@ -23,7 +24,7 @@ getRecordsBySource('cnn').then(data => {
     }
 
     titleScatter = new scatterPlot('scatterPlot', [titleTrace]);
-    descScatter = new scatterPlot('scatterPlotDesc', [descTrace])
+    // descScatter = new scatterPlot('scatterPlotDesc', [descTrace])
 });
 
 getRecords().then(data => {
@@ -64,15 +65,19 @@ getRecords().then(data => {
     descBar = new MultiBar('negBarChart', descTrace)
 })
 
-getCounts('cnn').then(data => {
+getAllCounts().then(data => {
     // console.log(data);
+    countData = data;
 
-    let titleCounts = Object.entries(data.title_counts).map(d => {
+    data = filterCountDataBySources(['cnn'])
+
+
+    let titleCounts = Object.entries(data.title).map(d => {
         return { word: d[0], count: d[1] };
     })
         .sort((a, b) => b.count - a.count)
         .filter(d => !badWords.includes(d.word));
-    let descCounts = Object.entries(data.description_counts).map(d => {
+    let descCounts = Object.entries(data.desc).map(d => {
         return { word: d[0], count: d[1] };
     })
         .sort((a, b) => b.count - a.count)
@@ -97,7 +102,7 @@ getCounts('cnn').then(data => {
 
     titleCountBar = new BarChart('titleWordCountBar', titleTrace, margin);
     descCountBar = new BarChart('descWordCountBar', descTrace, margin);
-
+    
 
     // console.log(descCounts);
 })
@@ -105,7 +110,7 @@ getCounts('cnn').then(data => {
 sources = ['cnn']
 
 d3.select('#scatter-checkboxes')
-    .selectAll('input')
+    .selectAll('button')
     .on('click', handleCheckBox);
 
 window.addEventListener('resize', () => {
@@ -117,5 +122,15 @@ window.addEventListener('resize', () => {
     descCountBar.render();
 })
 
+d3.select('#btn-test').on('click', () => {
+    let btn = d3.select(d3.event.target)
+    let btnClasses = btn.attr('class').split(' ')
+
+    if (btnClasses.includes('btn-primary')) {
+        btn.attr('class', 'btn btn-warning')
+    } else {
+        btn.attr('class', 'btn btn-primary')
+    }
+})
 
 
