@@ -1,8 +1,16 @@
 
-let parseTime = d3.timeParse('%Y-%m-%dT%H:%M:%SZ');
-let formatTime = d3.timeFormat('%H:%M');
-let badWords = [' ', '...', "…", '’s', '—']
-let countData = {}
+let parseTime = d3.timeParse('%Y-%m-%dT%H:%M:%SZ'),
+    formatTime = d3.timeFormat('%H:%M'),
+    badWords = [' ', '...', "…", '’s', '—'],
+    countData = {},
+    titleTracesScatter = [],
+    descTracesScatter = [],
+    multibarTitleTrace = [],
+    multibarDescTrace = [],
+    countBarTitleTrace = [],
+    countBarDescTrace = [],
+    countTitleOrDesc = true,
+    titleOrDesc = true;
 
 getRecordsBySource('cnn').then(data => {
 
@@ -23,6 +31,9 @@ getRecordsBySource('cnn').then(data => {
         color: colorBySource('cnn')
     }
 
+    titleTracesScatter.push(titleTrace);
+    descTracesScatter.push(descTrace);
+
     titleScatter = new scatterPlot('scatterPlot', [titleTrace]);
     // descScatter = new scatterPlot('scatterPlotDesc', [descTrace])
 });
@@ -30,8 +41,7 @@ getRecordsBySource('cnn').then(data => {
 getRecords().then(data => {
 
     let sources = ['cnn', 'nbc-news', 'bbc-news', 'fox-news', 'associated-press'];
-    let titleTrace = [];
-    let descTrace = [];
+
     sources.forEach(source => {
         let filteredData = data.filter(d => d.source === source)
         let titleCounts = {
@@ -57,16 +67,18 @@ getRecords().then(data => {
             }
 
         })
-        titleTrace.push(titleCounts);
-        descTrace.push(descCounts);
+
+
+        multibarTitleTrace.push(titleCounts);
+        multibarDescTrace.push(descCounts);
     })
 
-    titleBar = new MultiBar('posBarChart', titleTrace);
-    descBar = new MultiBar('negBarChart', descTrace)
+    titleBar = new MultiBar('posBarChart', multibarTitleTrace);
 })
 
+
+
 getAllCounts().then(data => {
-    // console.log(data);
     countData = data;
 
     data = filterCountDataBySources(['cnn'])
@@ -86,12 +98,12 @@ getAllCounts().then(data => {
 
 
     let titleTrace = {
-        x: titleCounts.map(d => d.word).slice(0, 10),
-        y: titleCounts.map(d => d.count).slice(0, 10)
+        x: titleCounts.map(d => d.word).slice(0, 20),
+        y: titleCounts.map(d => d.count).slice(0, 20)
     }
     let descTrace = {
-        x: descCounts.map(d => d.word).slice(0, 10),
-        y: descCounts.map(d => d.count).slice(0, 10)
+        x: descCounts.map(d => d.word).slice(0, 20),
+        y: descCounts.map(d => d.count).slice(0, 20)
     }
     margin = {
         top: 40,
@@ -100,11 +112,10 @@ getAllCounts().then(data => {
         right: 20
     }
 
-    titleCountBar = new BarChart('titleWordCountBar', titleTrace, margin);
-    descCountBar = new BarChart('descWordCountBar', descTrace, margin);
-    
+    countBarDescTrace = descTrace;
+    countBarTitleTrace = titleTrace;
 
-    // console.log(descCounts);
+    titleCountBar = new BarChart('titleWordCountBar', titleTrace, margin);
 })
 
 sources = ['cnn']
@@ -113,24 +124,56 @@ d3.select('#scatter-checkboxes')
     .selectAll('button')
     .on('click', handleCheckBox);
 
+d3.select('#test').on('click', () => {
+    console.log('testing')
+    titleBar.updateData(multibarDescTrace);
+})
+
 window.addEventListener('resize', () => {
     titleScatter.render();
-    descScatter.render();
+    // descScatter.render();
     titleBar.render();
-    descBar.render();
+    // descBar.render();
     titleCountBar.render();
-    descCountBar.render();
+    // descCountBar.render();
 })
 
-d3.select('#btn-test').on('click', () => {
-    let btn = d3.select(d3.event.target)
-    let btnClasses = btn.attr('class').split(' ')
-
-    if (btnClasses.includes('btn-primary')) {
-        btn.attr('class', 'btn btn-warning')
-    } else {
-        btn.attr('class', 'btn btn-primary')
-    }
+d3.select('#scatterTitle').on('click', () => {
+    titleOrDesc = true;
+    titleScatter.updateAllTraces(titleTracesScatter);
+    d3.select('#scatterDesc').classed('active', false);
+    d3.select(d3.event.target).classed('active', true)
 })
 
+d3.select('#scatterDesc').on('click', () => {
+    titleOrDesc = false;
+    titleScatter.updateAllTraces(descTracesScatter);
+    d3.select('#scatterTitle').classed('active', false);
+    d3.select(d3.event.target).classed('active', true)
+})
 
+d3.select('#multibarTitle').on('click', () => {
+    titleBar.updateData(multibarTitleTrace);
+    d3.select('#multibarTitle').classed('active', true);
+    d3.select('#multibarDesc').classed('active', false);
+})
+
+d3.select('#multibarDesc').on('click', () => {
+    titleBar.updateData(multibarDescTrace);
+    d3.select('#multibarTitle').classed('active', false);
+    d3.select('#multibarDesc').classed('active', true);
+})
+
+d3.select('#countBarTitle').on('click', () => {
+    countTitleOrDesc = true;
+    titleCountBar.updateBars(countBarTitleTrace);
+    d3.select('#countBarTitle').classed('active', true);
+    d3.select('#countBarDesc').classed('active', false);
+})
+
+d3.select('#countBarDesc').on('click', () => {
+    countTitleOrDesc = false;
+    titleCountBar.updateBars(countBarDescTrace);
+    d3.select('#countBarTitle').classed('active', false);
+    d3.select('#countBarDesc').classed('active', true);
+})

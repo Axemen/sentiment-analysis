@@ -1,6 +1,3 @@
-let titleTracesScatter = [];
-let descTracesScatter = [];
-
 function updateScattersBySource(source) {
     getRecordsBySource(source).then(data => {
         data.forEach(d => d.publishedAt = parseTime(d.publishedAt));
@@ -12,6 +9,7 @@ function updateScattersBySource(source) {
             name: source,
             color: colorBySource(source)
         }
+        
         let descTrace = {
             x: data.map(d => d.publishedAt),
             y: data.map(d => d.description_compound),
@@ -19,12 +17,19 @@ function updateScattersBySource(source) {
             color: colorBySource(source)
         }
 
+        if (titleOrDesc){
+            titleScatter.addTrace(titleTrace);
+        } else {
+            titleScatter.addTrace(descTrace);
+        }
+        
         titleTracesScatter.push(titleTrace);
         descTracesScatter.push(descTrace);
-
-        // titleScatter.addTrace(titleTrace);
-        // descScatter.addTrace(descTrace);
     })
+}
+
+function titleDescSwitcher() {
+    titleScatter.updateAllTraces(descTracesScatter);
 }
 
 function updateBarsBySources(sources) {
@@ -42,18 +47,24 @@ function updateBarsBySources(sources) {
         .filter(d => !badWords.includes(d.word));
 
     let titleTrace = {
-        x: titleCounts.map(d => d.word).slice(0, 10),
-        y: titleCounts.map(d => d.count).slice(0, 10)
+        x: titleCounts.map(d => d.word).slice(0, 20),
+        y: titleCounts.map(d => d.count).slice(0, 20)
     }
     let descTrace = {
-        x: descCounts.map(d => d.word).slice(0, 10),
-        y: descCounts.map(d => d.count).slice(0, 10)
+        x: descCounts.map(d => d.word).slice(0, 20),
+        y: descCounts.map(d => d.count).slice(0, 20)
     }
 
-    titleCountBar.updateBars(titleTrace);
-    descCountBar.updateBars(descTrace);
+    countBarDescTrace = descTrace;
+    countBarTitleTrace = titleTrace;
 
+    if (countTitleOrDesc) {
+        titleCountBar.updateBars(titleTrace);
+    } else {
+        titleCountBar.updateBars(descTrace);
+    }
 
+    
 }
 
 function colorBySource(source) {
@@ -85,18 +96,26 @@ function handleCheckBox() {
     let btn = d3.select(d3.event.target)
     let btnClasses = btn.attr('class').split(' ')
     let name = btn.attr('name')
+
+    let titleNames = titleTracesScatter.map(d => d.name);
+    let descNamees = descTracesScatter.map( d => d.name);
+
     if (btnClasses.includes('btn-danger')) {
-        btn.attr('class', 'btn btn-success')
+        
         updateScattersBySource(name);
         sources.push(name);
         updateBarsBySources(sources);
+        btn.attr('class', 'btn btn-success')
     } else {
-        btn.attr('class', 'btn btn-danger')
+        
         sources.splice(sources.indexOf(name), 1);
-        titleScatter.removeTrace(name);
-        descScatter.removeTrace(name);
+        titleTracesScatter.splice(titleNames.indexOf(name), 1);
+        descTracesScatter.splice(descNamees.indexOf(name), 1);
 
+        titleScatter.removeTrace(name);
         updateBarsBySources(sources);
+        
+        btn.attr('class', 'btn btn-danger')
     }
 
     // if (btnClasses.includes('btn-primary')) {
