@@ -46,6 +46,18 @@ function updateBarsBySources(sources) {
         descCountBar.updateBars(descTrace);
         
     })
+
+    getPeopleBySources(sources).then(data => {
+        let mutatedData = Object.entries(data).map(d => [d[0], d[1]])
+        mutatedData.sort((a, b) => b[1] - a[1])
+
+        let trace = {
+            x: mutatedData.map(d => d[0]).slice(0, 10),
+            y: mutatedData.map(d => d[1]).slice(0, 10)
+        }
+
+        peopleCountBar.updateBars(trace);
+    })
 }
 
 function colorBySource(source) {

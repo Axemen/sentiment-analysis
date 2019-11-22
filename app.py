@@ -9,7 +9,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy import MetaData
 
 from modules.api_calls import create_df_from_sources
-from modules.pre_processing import count_words
+from modules.pre_processing import count_words, get_entity_counts, get_people_counts
 from modules.sentiment_analysis import get_compound_score
 
 app = Flask(__name__)
@@ -122,6 +122,43 @@ def get_counts_sources(sources):
         'title_counts': dict(title_counts.most_common(50)),
         'description_counts': dict(desc_counts.most_common(50))
     })
+
+@app.route('/get-entities/<sources>')
+def get_entities(sources):
+    sources = sources.split(',')
+
+    stmt = db.session.query(Headlines)\
+        .filter(Headlines.source.in_(sources))\
+        .statement
+
+    df = pd.read_sql_query(stmt, db.session.bind)
+
+    corpus = ""
+    for article in df['description']:
+        corpus += article
+    ent_cnt, label_cnt = get_entity_counts(corpus)
+
+    return jsonify({
+        'ent_cnt': dict(ent_cnt),
+        'label_cnt': dict(label_cnt)
+    })
+
+@app.route('/get-people/<sources>')
+def get_people(sources):
+    sources = sources.split(',')
+
+    stmt = db.session.query(Headlines)\
+        .filter(Headlines.source.in_(sources))\
+        .statement
+
+    df = pd.read_sql_query(stmt, db.session.bind)
+
+    corpus = ""
+    for article in df['description']:
+        corpus += article
+    cnt = get_people_counts(corpus)
+
+    return jsonify(dict(cnt))
 
 @app.route('/test')
 def test():

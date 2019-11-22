@@ -11,7 +11,7 @@ class BarChart {
             this.margin = {}
             this.margin.top = 10;
             this.margin.right = 20;
-            this.margin.left = 30;
+            this.margin.left = 30;  
             this.margin.bottom = 20;
         } else {
             this.margin = margin;

@@ -36,3 +36,31 @@ def count_words(documents) -> Counter:
                 word_counter[word.lemma_] += 1
 
     return word_counter
+
+def get_entity_counts(corpus) -> list:
+    """
+        Returns the Counter objects for the entitiy counts (the number of times an entity appears in the corpus)
+        and returns the label counts (the number of times the label of an entity appears in the corpus)
+    """
+
+    doc = nlp(corpus)
+
+    ent_cnt = Counter()
+    label_cnt = Counter()
+
+    for ent in doc.ents:
+        ent_cnt[ent.text] += 1
+        label_cnt[ent.label_] += 1
+
+    return [ent_cnt, label_cnt] 
+
+def get_people_counts(corpus) -> Counter:
+    doc = nlp(corpus)
+
+    cnt = Counter()
+
+    for ent in doc.ents:
+        if ent.label_ == 'PERSON':
+            cnt[ent.text] += 1
+
+    return cnt

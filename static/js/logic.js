@@ -102,6 +102,25 @@ getCounts('cnn').then(data => {
     // console.log(descCounts);
 })
 
+getPeopleBySources(['cnn']).then(data => {
+
+    let mutatedData = Object.entries(data).map(d => [d[0], d[1]])
+    mutatedData.sort((a, b) => b[1]-a[1])
+    
+    let trace = {
+        x: mutatedData.map(d => d[0]).slice(0, 10),
+        y: mutatedData.map(d => d[1]).slice(0, 10)
+    }
+    margin = {
+        top: 40,
+        bottom: 100,
+        left: 20,
+        right: 20
+    }
+
+    peopleCountBar = new BarChart('peopleCount', trace, margin);
+})
+
 sources = ['cnn']
 
 d3.select('#scatter-checkboxes')
