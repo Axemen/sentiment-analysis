@@ -25,3 +25,7 @@ async function getPeopleBySources(sources) {
     response = d3.json(`/get-people/${sources.join()}`)
     return await response;
 }
+async function getAllCounts() {
+    response = d3.json('/get-counts/allsources');
+    return await response;
+}

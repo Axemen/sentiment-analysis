@@ -33,6 +33,7 @@ sources = ['cnn', 'nbc-news', 'bbc-news', 'fox-news', 'associated-press']
 def home():
     return render_template('index.html')
 
+
 @app.route('/get-scores/<source>')
 def get_sentiment_scores(source):
     stmt = db.session.query(Headlines).statement
@@ -44,6 +45,7 @@ def get_sentiment_scores(source):
         'source': list(df['source']),
         'publish_date': list(df['publishedAt'])
     })
+
 
 @app.route('/get-records')
 def get_records():
@@ -94,7 +96,7 @@ def get_counts():
 @app.route('/get-counts/<source>')
 def get_counts_source(source):
     stmt = db.session.query(Headlines)\
-    .filter(Headlines.source == source)\
+        .filter(Headlines.source == source)\
         .statement
     df = pd.read_sql_query(stmt, db.session.bind)
 
@@ -105,6 +107,7 @@ def get_counts_source(source):
         'title_counts': dict(title_counts.most_common(50)),
         'description_counts': dict(desc_counts.most_common(50))
     })
+
 
 @app.route('/get-counts/sources/<sources>')
 def get_counts_sources(sources):
@@ -119,14 +122,14 @@ def get_counts_sources(sources):
     desc_counts = count_words(df['description'])
 
     return jsonify({
-        'title_counts': dict(title_counts.most_common(50)),
-        'description_counts': dict(desc_counts.most_common(50))
+        'title': dict(title_counts.most_common(50)),
+        'desc': dict(desc_counts.most_common(50))
     })
+
 
 @app.route('/get-entities/<sources>')
 def get_entities(sources):
     sources = sources.split(',')
-
     stmt = db.session.query(Headlines)\
         .filter(Headlines.source.in_(sources))\
         .statement
@@ -142,6 +145,7 @@ def get_entities(sources):
         'ent_cnt': dict(ent_cnt),
         'label_cnt': dict(label_cnt)
     })
+
 
 @app.route('/get-people/<sources>')
 def get_people(sources):
@@ -159,6 +163,29 @@ def get_people(sources):
     cnt = get_people_counts(corpus)
 
     return jsonify(dict(cnt))
+
+
+@app.route('/get-counts/allsources')
+def get_counts_all():
+    sources = ['cnn', 'nbc-news', 'bbc-news', 'fox-news', 'associated-press']
+
+    stmt = db.session.query(Headlines)\
+        .filter(Headlines.source.in_(sources))\
+        .statement
+    df = pd.read_sql_query(stmt, db.session.bind)
+
+    result_dict = {}
+
+    for source in sources:
+        temp = {}
+        temp['title'] = dict(count_words(
+            df.loc[df['source'] == source]['title']).most_common(50))
+        temp['desc'] = dict(count_words(
+            df.loc[df['source'] == source]['description']).most_common(50))
+        result_dict[source] = temp
+
+    return jsonify(result_dict)
+
 
 @app.route('/test')
 def test():

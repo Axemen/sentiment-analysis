@@ -21,8 +21,11 @@ class scatterPlot {
             this.margin = margin;
         }
         // Creatin the colorscale in order to color the traces in an appropriate order. 
-        this.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+        this.colorScale = d3.scaleOrdinal()
+            .domain(['#235789', '#ED1C24', '#F1D302', '#EC058E', '#85CB33']);
 
+        
+ 
         traces.forEach((trace, i) => this.assert(trace.name, `Trace at index ${i} does not have a name!`))
         this.traces = traces;
         traces.forEach((trace, i) => this.checkTrace(trace))
@@ -134,6 +137,7 @@ class scatterPlot {
                 .style('fill', trace.color);
         })
     }
+
     /**
      * Translates the data from the current trace into a records based format for d3 consumption. 
      * 
@@ -208,6 +212,13 @@ class scatterPlot {
 
         trace = this.checkTrace(trace);
         // Check that the incoming trace has a name and that said name is unique
+        if(this.traces.map(d => d.name).includes(trace.name)) {
+            console.log('scatter Traces', this.traces);
+            console.log('scatter Names', this.traces.map(d => d.name));
+            console.log('titleTracesScatter', titleTracesScatter);
+            console.log('descTracesScatter', descTracesScatter);
+        }
+
         this.assert(trace.name, 'Trace must have a name!')
         this.assert(!this.traces.map(d => d.name).includes(trace.name),
             'Traces must have unique names!')
@@ -263,7 +274,6 @@ class scatterPlot {
      * @param {Object} trace -> The trace which we wish to check. 
      */
     checkTrace(trace) {
-
         let names = this.traces.map(d => d.name)
         if (names.includes(trace.name)) {
             var traceIndex = names.indexOf(trace.name);
@@ -276,5 +286,11 @@ class scatterPlot {
         }
 
         return trace;
+    }
+
+    updateAllTraces(newTraces) {
+        delete this.traces;
+        this.traces = newTraces;
+        this.render()
     }
 }
