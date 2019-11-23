@@ -3,13 +3,17 @@ let parseTime = d3.timeParse('%Y-%m-%dT%H:%M:%SZ'),
     formatTime = d3.timeFormat('%H:%M'),
     badWords = [' ', '...', "…", '’s', '—'],
     countData = {},
+    peopleData = {},
     titleTracesScatter = [],
     descTracesScatter = [],
     multibarTitleTrace = [],
     multibarDescTrace = [],
     countBarTitleTrace = [],
     countBarDescTrace = [],
+    peopleBarTitleTrace = [],
+    peopleBarDescTrace = [],
     countTitleOrDesc = true,
+    peopleTitleOrDesc = true,
     titleOrDesc = true;
 
 getRecordsBySource('cnn').then(data => {
@@ -118,15 +122,28 @@ getAllCounts().then(data => {
     titleCountBar = new BarChart('titleWordCountBar', titleTrace, margin);
 })
 
-getPeopleBySources(['cnn']).then(data => {
+getAllPeople().then(data => {
 
-    let mutatedData = Object.entries(data).map(d => [d[0], d[1]])
-    mutatedData.sort((a, b) => b[1]-a[1])
-    
-    let trace = {
-        x: mutatedData.map(d => d[0]).slice(0, 10),
-        y: mutatedData.map(d => d[1]).slice(0, 10)
+    peopleData = data;
+    data = filterPeopletDataBySources(['cnn']);
+
+    let mutatedDataTitle = Object.entries(data['title']).map(d => [d[0], d[1]])
+    mutatedDataTitle.sort((a, b) => b[1] - a[1])
+
+    let mutatedDataDesc = Object.entries(data['desc']).map(d => [d[0], d[1]])
+    mutatedDataDesc.sort((a, b) => b[1] - a[1])
+
+
+    peopleBarTitleTrace = {
+        x: mutatedDataTitle.map(d => d[0]).slice(0, 20),
+        y: mutatedDataTitle.map(d => d[1]).slice(0, 20)
     }
+
+    peopleBarDescTrace = {
+        x: mutatedDataDesc.map(d => d[0]).slice(0, 20),
+        y: mutatedDataDesc.map(d => d[1]).slice(0, 20)
+    }
+
     margin = {
         top: 40,
         bottom: 100,
@@ -134,7 +151,7 @@ getPeopleBySources(['cnn']).then(data => {
         right: 20
     }
 
-    peopleCountBar = new BarChart('peopleCount', trace, margin);
+    peopleCountBar = new BarChart('peopleCount', peopleBarTitleTrace, margin);
 })
 
 sources = ['cnn']
@@ -150,11 +167,9 @@ d3.select('#test').on('click', () => {
 
 window.addEventListener('resize', () => {
     titleScatter.render();
-    // descScatter.render();
     titleBar.render();
-    // descBar.render();
     titleCountBar.render();
-    // descCountBar.render();
+    peopleCountBar.render();
 })
 
 d3.select('#scatterTitle').on('click', () => {
@@ -195,4 +210,18 @@ d3.select('#countBarDesc').on('click', () => {
     titleCountBar.updateBars(countBarDescTrace);
     d3.select('#countBarTitle').classed('active', false);
     d3.select('#countBarDesc').classed('active', true);
+})
+
+d3.select('#peopleBarTitle').on('click', () => {
+    peopleTitleOrDesc = true;
+    peopleCountBar.updateBars(peopleBarTitleTrace);
+    d3.select('#peopleBarTitle').classed('active', true);
+    d3.select('#peopleBarDesc').classed('active', false);
+})
+
+d3.select('#peopleBarDesc').on('click', () => {
+    peopleTitleOrDesc = false;
+    peopleCountBar.updateBars(peopleBarDescTrace);
+    d3.select('#peopleBarTitle').classed('active', false);
+    d3.select('#peopleBarDesc').classed('active', true);
 })

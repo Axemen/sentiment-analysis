@@ -11,7 +11,7 @@ class BarChart {
             this.margin = {}
             this.margin.top = 10;
             this.margin.right = 20;
-            this.margin.left = 30;  
+            this.margin.left = 30;
             this.margin.bottom = 20;
         } else {
             this.margin = margin;
@@ -88,10 +88,14 @@ class BarChart {
             .selectAll('text')
             .attr('y', '0')
             .attr('x', '9')
-            .attr('dy', '.35em')
+            .attr('dy', '.35em');
+
+        this.svg.select('.x.axis')
+            .selectAll('text')
             .attr('transform', 'rotate(90)')
             .style('text-anchor', 'start')
             .style('font-size', '.8rem');
+
         this.svg.select('.y.axis')
             .transition()
             .call(this.yAxis);

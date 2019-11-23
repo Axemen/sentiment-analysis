@@ -29,3 +29,8 @@ async function getAllCounts() {
     response = d3.json('/get-counts/allsources');
     return await response;
 }
+
+async function getAllPeople() {
+    response = d3.json('/get-people/allsources');
+    return await response;
+}

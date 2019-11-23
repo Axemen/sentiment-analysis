@@ -64,20 +64,29 @@ function updateBarsBySources(sources) {
         titleCountBar.updateBars(descTrace);
     }
 
-    getPeopleBySources(sources).then(data => {
-        let mutatedData = Object.entries(data).map(d => [d[0], d[1]])
-        mutatedData.sort((a, b) => b[1] - a[1])
+    let filteredData = filterPeopletDataBySources(sources);
 
-        let trace = {
-            x: mutatedData.map(d => d[0]).slice(0, 10),
-            y: mutatedData.map(d => d[1]).slice(0, 10)
-        }
+    let mutatedDataTitle = Object.entries(filteredData['title']).map(d => [d[0], d[1]])
+    mutatedDataTitle.sort((a, b) => b[1] - a[1])
 
-        peopleCountBar.updateBars(trace);
-    })
+    let mutatedDataDesc = Object.entries(filteredData['desc']).map(d => [d[0], d[1]])
+    mutatedDataDesc.sort((a, b) => b[1] - a[1])
 
+    peopleBarTitleTrace = {
+        x: mutatedDataTitle.map(d => d[0]).slice(0, 20),
+        y: mutatedDataTitle.map(d => d[1]).slice(0, 20)
+    }
 
+    peopleBarDescTrace = {
+        x: mutatedDataDesc.map(d => d[0]).slice(0, 20),
+        y: mutatedDataDesc.map(d => d[1]).slice(0, 20)
+    }
 
+    if (peopleTitleOrDesc) {
+        peopleCountBar.updateBars(peopleBarTitleTrace);
+    } else {
+        peopleCountBar.updateBars(peopleBarDescTrace);
+    }
 }
 
 function colorBySource(source) {
@@ -170,6 +179,35 @@ function filterCountDataBySources(sources) {
                     combined.desc[word] += countData[source]['desc'][word]
                 } else {
                     combined.desc[word] = countData[source]['desc'][word]
+                }
+            })
+    })
+
+    return combined;
+}
+
+function filterPeopletDataBySources(sources) {
+    let combined = {
+        title: {},
+        desc: {}
+    }
+
+    sources.forEach(source => {
+        Object.keys(peopleData[source].title)
+            .forEach(word => {
+                if (word in combined.title) {
+                    combined.title[word] += peopleData[source]['title'][word]
+                } else {
+                    combined.title[word] = peopleData[source]['title'][word]
+                }
+            })
+
+        Object.keys(peopleData[source].desc)
+            .forEach(word => {
+                if (word in combined.desc) {
+                    combined.desc[word] += peopleData[source]['desc'][word]
+                } else {
+                    combined.desc[word] = peopleData[source]['desc'][word]
                 }
             })
     })

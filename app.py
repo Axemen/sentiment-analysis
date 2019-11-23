@@ -164,6 +164,38 @@ def get_people(sources):
 
     return jsonify(dict(cnt))
 
+@app.route('/get-people/allsources')
+def get_people_all():
+    sources = ['cnn', 'nbc-news', 'bbc-news', 'fox-news', 'associated-press']
+
+    stmt = db.session.query(Headlines)\
+        .filter(Headlines.source.in_(sources))\
+        .statement
+
+    df = pd.read_sql_query(stmt, db.session.bind)
+
+    result_dict = {}
+
+    for source in sources:
+        temp = {}
+
+        corpus = ""
+        for article in df.loc[df['source'] == source]['title']:
+            corpus += article
+        cnt = get_people_counts(corpus)
+        temp['title'] = dict(cnt)
+
+        corpus = ""
+        for article in df.loc[df['source'] == source]['description']:
+            corpus += article
+        cnt = get_people_counts(corpus)
+        temp['desc'] = dict(cnt)
+
+        result_dict[source] = temp
+    
+
+    return jsonify(result_dict)
+
 
 @app.route('/get-counts/allsources')
 def get_counts_all():
