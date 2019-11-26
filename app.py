@@ -24,7 +24,6 @@ Base = automap_base(metadata=metadata)
 Base.prepare()
 
 Headlines = Base.classes.headlines
-# print(Base.metadata.tables.keys())
 
 sources = ['cnn', 'nbc-news', 'bbc-news', 'fox-news', 'associated-press']
 
@@ -32,20 +31,6 @@ sources = ['cnn', 'nbc-news', 'bbc-news', 'fox-news', 'associated-press']
 @app.route('/')
 def home():
     return render_template('index.html')
-
-
-@app.route('/get-scores/<source>')
-def get_sentiment_scores(source):
-    stmt = db.session.query(Headlines).statement
-    df = pd.read_sql_query(stmt, db.session.bind)
-    df = df.loc[df['source'] == source]
-    return jsonify({
-        'description_scores': list(df['description_compound']),
-        'title_scores': list(df['title_compound']),
-        'source': list(df['source']),
-        'publish_date': list(df['publishedAt'])
-    })
-
 
 @app.route('/get-records')
 def get_records():

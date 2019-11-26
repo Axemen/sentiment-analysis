@@ -214,3 +214,7 @@ function filterPeopletDataBySources(sources) {
 
     return combined;
 }
+
+function calcHistogram(data, key) {
+    
+}
